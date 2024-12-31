@@ -1,4 +1,4 @@
-package com.example.fauxly;
+package com.example.fauxly.ui.fragment;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.example.fauxly.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,8 +60,7 @@ public class QuizFragment extends Fragment {
     }
 
     private void checkAnswer(int selectedId) {
-        // Example logic for checking the answer
-        String correctAnswer = "Answer C"; // This should come from your data model
+        String correctAnswer = "Answer C"; // need to get correct answer from database
         RadioButton selectedRadioButton = answersGroup.findViewById(selectedId);
         if (selectedRadioButton != null) {
             if (selectedRadioButton.getText().equals(correctAnswer)) {
