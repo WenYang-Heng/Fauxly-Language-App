@@ -42,18 +42,17 @@ public class AchievementFragment extends Fragment {
         achievements.add(new Achievement("Achievement 2", "Description of achievement"));
         achievements.add(new Achievement("Achievement 3", "Description of achievement"));
 
-        // Set up the adapter with a click listener
         AchievementAdapter adapter = new AchievementAdapter(achievements, achievement -> {
             // Pass title, description, and date to AchievementDetailFragment
             AchievementDetailFragment detailFragment = AchievementDetailFragment.newInstance(
                     achievement.getTitle(),
                     achievement.getDescription(),
-                    "25 November 2024" // Replace with actual date from your data source
+                    "25 November 2024"
             );
 
             FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container_view, detailFragment);
-            transaction.addToBackStack(null); // Add to back stack for navigation
+            transaction.addToBackStack(null);
             transaction.commit();
         });
 
