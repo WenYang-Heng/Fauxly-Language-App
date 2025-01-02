@@ -6,6 +6,5 @@
 
     <!-- '+' icon -->
     <item
-        android:drawable="@drawable/ic_play_btn"
-        android:gravity="center" />
+        android:drawable="@drawable/ic_play_btn" />
 </layer-list>
