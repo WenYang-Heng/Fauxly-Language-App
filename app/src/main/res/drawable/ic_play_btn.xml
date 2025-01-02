@@ -8,13 +8,7 @@
 
     <!-- Horizontal line of the '+' -->
     <path
-        android:strokeWidth="2"
-        android:strokeColor="#33363F"
-        android:pathData="M12,2 L12,22" />
+        android:fillColor="#33363F"
+        android:pathData="M8,5 L20,12 L8,19 Z" />
 
-    <!-- Horizontal line -->
-    <path
-        android:strokeWidth="2"
-        android:strokeColor="#33363F"
-        android:pathData="M2,12 L22,12" />
 </vector>

@@ -2,9 +2,10 @@
 
     <!-- Background circle -->
     <item
-        android:drawable="@drawable/button_add_flashcard" />
+        android:drawable="@drawable/shape_rounded_square" />
 
     <!-- '+' icon -->
     <item
-        android:drawable="@drawable/ic_plus_icon" />
+        android:drawable="@drawable/ic_play_btn"
+        android:gravity="center" />
 </layer-list>
