@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.fauxly.model.Lesson;
 import com.example.fauxly.model.LessonContent;
+import com.example.fauxly.model.User;
+import com.example.fauxly.model.UserStats;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +108,82 @@ public class DatabaseRepository {
         cursor.close();
         return contents;
     }
+
+    // Get User by ID
+    public User getUserById(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        User user = null;
+
+        Cursor cursor = db.query(
+                "user",               // Table name
+                new String[]{"user_id", "name", "email", "password"}, // Columns to return
+                "user_id = ?",        // WHERE clause
+                new String[]{String.valueOf(userId)}, // WHERE arguments
+                null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            user = new User(
+                    cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("email")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("password"))
+            );
+            cursor.close();
+        }
+
+        return user;
+    }
+
+    // Get UserStats by User ID
+    public UserStats getUserStatsById(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        UserStats stats = null;
+
+        Cursor cursor = db.query(
+                "user_stats",         // Table name
+                new String[]{"user_id", "current_level", "total_xp", "current_xp", "level_up_xp", "words_learned", "total_login_streak", "five_day_login_streak", "last_claim_date"}, // Columns to return
+                "user_id = ?",        // WHERE clause
+                new String[]{String.valueOf(userId)}, // WHERE arguments
+                null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            stats = new UserStats(
+                    cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("current_level")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("total_xp")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("current_xp")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("level_up_xp")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("words_learned")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("total_login_streak")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("five_day_login_streak")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("last_claim_date"))
+            );
+            cursor.close();
+        }
+
+        return stats;
+    }
+
+    public void resetUserStreak(int userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("five_day_login_streak", 0);
+        values.put("last_claim_date", (String) null); // Reset last claim date
+
+        db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
+        db.close();
+    }
+
+    public void updateUserStreakAndDate(int userId, int claimedDay, String currentDate) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("five_day_login_streak", claimedDay);
+        values.put("last_claim_date", currentDate); // Update last claim date
+
+        db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
+        db.close();
+    }
+
 
 
 }

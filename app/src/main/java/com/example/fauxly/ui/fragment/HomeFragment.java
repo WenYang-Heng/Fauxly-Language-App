@@ -7,60 +7,160 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.fauxly.R;
+import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.model.UserStats;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class HomeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment home.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private LinearLayout day1, day2, day3, day4, day5;
+    private DatabaseRepository repository;
+    private String userId = "100";
+    private UserStats stats;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        // Initialize the LinearLayouts
+        day1 = view.findViewById(R.id.day1);
+        day2 = view.findViewById(R.id.day2);
+        day3 = view.findViewById(R.id.day3);
+        day4 = view.findViewById(R.id.day4);
+        day5 = view.findViewById(R.id.day5);
+
+        repository = new DatabaseRepository(getContext());
+
+        // Fetch user streak and set up the UI
+        fetchUserStats();
+
+        return view;
     }
+
+    private void fetchUserStats() {
+        stats = repository.getUserStatsById(Integer.parseInt(userId)); // Replace with actual user ID logic
+
+        if (stats != null) {
+            String lastClaimDate = stats.getLastClaimDate();
+            int fiveDayLoginStreak = stats.getFiveDayLoginStreak();
+
+            // Check if it's a new day
+            boolean isNewDay = shouldResetStreak(lastClaimDate);
+
+            // If it's a new day and the streak is completed (5 days), reset
+            if (fiveDayLoginStreak == 5 && isNewDay) {
+                repository.resetUserStreak(Integer.parseInt(userId)); // Reset streak in database
+                fiveDayLoginStreak = 0; // Reset local streak
+                Toast.makeText(getContext(), "Streak reset! Start again.", Toast.LENGTH_SHORT).show();
+            } else if (isNewDay) {
+                // Reset streak for missed claim
+                repository.resetUserStreak(Integer.parseInt(userId));
+                fiveDayLoginStreak = 0; // Reset local streak
+            }
+
+            // Update the UI based on the streak
+            updateStreakUI(fiveDayLoginStreak);
+        } else {
+            Toast.makeText(getContext(), "User stats not found!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private boolean shouldResetStreak(String lastClaimDate) {
+        if (lastClaimDate == null || lastClaimDate.isEmpty()) return true;
+
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date lastDate = dateFormat.parse(lastClaimDate);
+            Date currentDate = new Date();
+
+            // Check if the current date is more than 1 day after the last claim date
+            return !dateFormat.format(currentDate).equals(dateFormat.format(lastDate));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true; // Reset streak on parsing errors
+        }
+    }
+
+    private void updateStreakUI(int fiveDayLoginStreak) {
+        // Reset all days to default disabled state
+        resetDayUI(day1);
+        resetDayUI(day2);
+        resetDayUI(day3);
+        resetDayUI(day4);
+        resetDayUI(day5);
+
+        // Update claimed days
+        if (fiveDayLoginStreak >= 1) setDayClaimed(day1);
+        if (fiveDayLoginStreak >= 2) setDayClaimed(day2);
+        if (fiveDayLoginStreak >= 3) setDayClaimed(day3);
+        if (fiveDayLoginStreak >= 4) setDayClaimed(day4);
+        if (fiveDayLoginStreak >= 5) setDayClaimed(day5);
+
+        // Enable the current claimable day only if allowed to claim
+        if (canClaimForToday()) {
+            if (fiveDayLoginStreak == 0) enableDayForClaim(day1, 1);
+            else if (fiveDayLoginStreak == 1) enableDayForClaim(day2, 2);
+            else if (fiveDayLoginStreak == 2) enableDayForClaim(day3, 3);
+            else if (fiveDayLoginStreak == 3) enableDayForClaim(day4, 4);
+            else if (fiveDayLoginStreak == 4) enableDayForClaim(day5, 5);
+        }
+    }
+
+
+    private void resetDayUI(LinearLayout day) {
+        day.setBackgroundResource(R.drawable.xp_claim_rounded_corners); // Default background
+        day.setClickable(false); // Disable clicking
+    }
+
+    private void setDayClaimed(LinearLayout day) {
+        day.setBackgroundResource(R.drawable.xp_claimed); // Change to claimed background
+        day.setClickable(false); // Ensure claimed days are not clickable
+    }
+
+    private void enableDayForClaim(LinearLayout day, int dayNumber) {
+        day.setClickable(true);
+        day.setOnClickListener(v -> claimXP(day, dayNumber));
+        day.setBackgroundResource(R.drawable.xp_ready_to_claim); // Highlight as claimable
+    }
+
+    private boolean canClaimForToday() {
+        if (stats.getLastClaimDate() == null) return true;
+
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date lastClaimDate = dateFormat.parse(stats.getLastClaimDate());
+            Date currentDate = new Date();
+
+            // Return true if last claim date is not the same as today's date
+            return !dateFormat.format(lastClaimDate).equals(dateFormat.format(currentDate));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void claimXP(LinearLayout day, int dayNumber) {
+        // Get the current date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String currentDate = dateFormat.format(new Date());
+
+        // Update the database to mark the day as claimed
+        repository.updateUserStreakAndDate(Integer.parseInt(userId), dayNumber, currentDate);
+
+        // Fetch updated user stats
+        fetchUserStats();
+
+        // Notify the user
+        Toast.makeText(getContext(), "Day " + dayNumber + " claimed!", Toast.LENGTH_SHORT).show();
+    }
+
 }

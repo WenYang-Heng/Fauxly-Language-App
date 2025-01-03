@@ -33,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "words_learned INTEGER, " +
                 "total_login_streak INTEGER, " +
                 "five_day_login_streak INTEGER, " +
+                "last_claim_date TEXT, " + // Include last_claim_date in schema
                 "FOREIGN KEY(user_id) REFERENCES user(user_id)" +
                 ");");
 
@@ -123,10 +124,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         android.util.Log.d("DatabaseHelper", "All tables created successfully.");
 
+        insertDefaultTestUser(db);
         insertDefaultLanguages(db);
         insertDefaultLessons(db);
         insertDefaultLessonContent(db);
     }
+
+    private void insertDefaultTestUser(SQLiteDatabase db) {
+        // Insert default test user with user_id set to 100
+        db.execSQL("INSERT INTO user (user_id, name, email, password) VALUES (100, 'Test User', 'test@example.com', '12345');");
+
+        // Insert default test user's stats
+        db.execSQL("INSERT INTO user_stats (user_id, current_level, total_xp, current_xp, level_up_xp, words_learned, total_login_streak, five_day_login_streak, last_claim_date) " +
+                "VALUES (100, 1, 0, 0, 1000, 0, 0, 0, NULL);");
+
+        android.util.Log.d("DatabaseHelper", "Default test user and stats inserted.");
+    }
+
 
     private void insertDefaultLanguages(SQLiteDatabase db) {
         db.execSQL("INSERT INTO language (name) VALUES ('Japanese');");
