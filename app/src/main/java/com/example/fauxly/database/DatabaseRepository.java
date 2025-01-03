@@ -2,7 +2,14 @@ package com.example.fauxly.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.fauxly.model.Lesson;
+import com.example.fauxly.model.LessonContent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseRepository {
 
@@ -61,4 +68,44 @@ public class DatabaseRepository {
     }
 
     // Add similar methods for other tables...
+    public Lesson getLesson(String lessonId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Lesson lesson = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM lesson WHERE lesson_id = ?", new String[]{lessonId});
+        if (cursor.moveToFirst()) {
+            lesson = new Lesson(
+                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("level")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("lesson_number")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("language_id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_title"))
+            );
+        }
+        cursor.close();
+        return lesson;
+    }
+
+    public List<LessonContent> getLessonContents(String lessonId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<LessonContent> contents = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM lesson_content WHERE lesson_id = ? ORDER BY content_order", new String[]{lessonId});
+        while (cursor.moveToNext()) {
+            contents.add(new LessonContent(
+                    cursor.getInt(cursor.getColumnIndexOrThrow("content_id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_id")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("content_order")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("content_type")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("content_data")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("path")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("word")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("pronunciation"))
+            ));
+        }
+        cursor.close();
+        return contents;
+    }
+
+
 }

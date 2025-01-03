@@ -85,6 +85,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "content_type TEXT, " +  // Text, Image, Video, etc.
                 "content_data TEXT, " +
                 "path TEXT, " +  // File path or URL for multimedia content
+                "word TEXT, " +  // Individual word (if applicable)
+                "pronunciation TEXT, " +  // English pronunciation for the word
                 "FOREIGN KEY(lesson_id) REFERENCES lesson(lesson_id)" +  // Links to lesson_id in lesson table
                 ");");
 
@@ -123,6 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         insertDefaultLanguages(db);
         insertDefaultLessons(db);
+        insertDefaultLessonContent(db);
     }
 
     private void insertDefaultLanguages(SQLiteDatabase db) {
@@ -149,31 +152,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void insertDefaultLessonContent(SQLiteDatabase db) {
         // Lesson 1 Content
-        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path) VALUES " +
-                "('BL1', 1, 'Text', 'Japanese uses three writing systems: Hiragana, Katakana, and Kanji.', NULL), " +
-                "('BL1', 2, 'Text', 'Hiragana is phonetic and used for native Japanese words.', NULL), " +
-                "('BL1', 3, 'Text', 'The first five Hiragana characters are あ, い, う, え, お.', NULL), " +
-                "('BL1', 4, 'Image', 'Hiragana chart for reference.', '/path/to/hiragana_chart.png');");
+        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation) VALUES " +
+                "('BL1', 1, 'Text', 'Japanese uses three writing systems: Hiragana, Katakana, and Kanji.', NULL, NULL, NULL), " +
+                "('BL1', 2, 'Text', 'Hiragana is phonetic and used for native Japanese words.', NULL, NULL, NULL), " +
+                "('BL1', 3, 'Text', 'The first five Hiragana characters are あ, い, う, え, お.', NULL, NULL, NULL), " +
+                "('BL1', 3, 'Word', NULL, 'bl1_ah', 'あ', 'A (ah)'), " +
+                "('BL1', 4, 'Word', NULL, 'bl1_ee', 'い', 'I (ee)'), " +
+                "('BL1', 5, 'Word', NULL, 'bl1_uu', 'う', 'U (oo)'), " +
+                "('BL1', 6, 'Word', NULL, 'bl1_eh', 'え', 'E (eh)'), " +
+                "('BL1', 7, 'Word', NULL, 'bl1_oh', 'お', 'O (oh)');");
 
         // Lesson 2 Content
-        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path) VALUES " +
-                "('BL2', 1, 'Text', 'Learn basic greetings in Japanese.', NULL), " +
-                "('BL2', 2, 'Text', 'Hello: こんにちは (Konnichiwa)', NULL), " +
-                "('BL2', 3, 'Text', 'Good morning: おはようございます (Ohayou gozaimasu)', NULL), " +
-                "('BL2', 4, 'Text', 'Good evening: こんばんは (Konbanwa)', NULL), " +
-                "('BL2', 5, 'Text', 'Thank you: ありがとう (Arigatou)', NULL);");
+        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation) VALUES " +
+                "('BL2', 1, 'Text', 'Learn basic greetings in Japanese.', NULL, NULL, NULL), " +
+                "('BL2', 2, 'Word', 'Hello', 'bl2_konnichiwa', 'こんにちは', 'Konnichiwa (koh-nee-chee-wah)'), " +
+                "('BL2', 3, 'Word', 'Good Morning', 'bl2_ohayou_gozaimasu', 'おはようございます', 'Ohayou gozaimasu (oh-ha-yoh goh-zai-mahs)'), " +
+                "('BL2', 4, 'Word', 'Good Evening', 'bl2_konbanwa', 'こんばんは', 'Konbanwa (kohn-bahn-wah)'), " +
+                "('BL2', 5, 'Word', 'Good Night', 'bl2_oyasuminasai', 'おやすみなさい', 'Oyasuminasai (oh-yah-soo-mee-nah-sai)'), " +
+                "('BL2', 6, 'Word', 'Thank you', 'bl2_arigatou', 'ありがとう', 'Arigatou (ah-ree-gah-toh)');");
 
         // Lesson 3 Content
-        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path) VALUES " +
-                "('BL3', 1, 'Text', 'Learn numbers 1-10 in Japanese.', NULL), " +
-                "('BL3', 2, 'Text', '1: いち (Ichi), 2: に (Ni), 3: さん (San), 4: よん (Yon), 5: ご (Go)', NULL), " +
-                "('BL3', 3, 'Text', '6: ろく (Roku), 7: なな (Nana), 8: はち (Hachi), 9: きゅう (Kyuu), 10: じゅう (Juu)', NULL), " +
-                "('BL3', 4, 'Text', 'Asking time: いま なんじ ですか？ (Ima nanji desu ka?)', NULL), " +
-                "('BL3', 5, 'Text', 'Example: It’s 2 o’clock: にじです (Ni-ji desu).', NULL);");
+        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation) VALUES " +
+                "('BL3', 1, 'Text', 'Learn numbers 1-10 in Japanese.', NULL, NULL, NULL), " +
+                "('BL3', 2, 'Word', 'One', 'bl3_ichi', 'いち', 'Ichi (ee-chee)'), " +
+                "('BL3', 3, 'Word', 'Two', 'bl3_ni', 'に', 'Ni (nee)'), " +
+                "('BL3', 4, 'Word', 'Three', 'bl3_san', 'さん', 'San (sahn)'), " +
+                "('BL3', 5, 'Word', 'Four', 'bl3_yon', 'よん', 'Yon (yohn)'), " +
+                "('BL3', 6, 'Word', 'Five', 'bl3_go', 'ご', 'Go (goh)'), " +
+                "('BL3', 7, 'Word', 'Six', 'bl3_roku', 'ろく', 'Roku (roh-koo)'), " +
+                "('BL3', 8, 'Word', 'Seven', 'bl3_nana', 'なな', 'Nana (nah-nah)'), " +
+                "('BL3', 9, 'Word', 'Eight', 'bl3_hachi', 'はち', 'Hachi (hah-chee)'), " +
+                "('BL3', 10, 'Word', 'Nine', 'bl3_kyuu', 'きゅう', 'Kyuu (kyoo)'), " +
+                "('BL3', 11, 'Word', 'Ten', 'bl3_juu', 'じゅう', 'Juu (joo)'), " +
+                "('BL3', 12, 'Word', 'Asking Time', 'bl3_asking_time', 'いま なんじ ですか？', 'Ima nanji desu ka? (What time is it?)');");
+
 
         // Log the completion of data insertion
-        android.util.Log.d("DatabaseHelper", "Default lesson content inserted.");
+        android.util.Log.d("DatabaseHelper", "Default lesson content with updated words and pronunciation inserted.");
     }
+
 
 
 

@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 //            Log.d("DatabaseTest", "Failed to delete the database or it does not exist.");
 //        }
 
-        // Reinitialize the database
+//         Reinitialize the database
         DatabaseHelper dbHelper = new DatabaseHelper(this);
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
