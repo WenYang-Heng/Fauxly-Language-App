@@ -17,4 +17,9 @@ import com.google.android.material.imageview.ShapeableImageView;
 public class WordbankFragment extends Fragment{
     private static final String ARG_TITLE = "title";
 
+    public WordbankFragment() {
+        // Required empty public constructor
+        super(R.layout.fragment_wordbank);
+    }
+
 }
