@@ -128,11 +128,42 @@
 
         <Space android:layout_width="match_parent" android:layout_height="19dp"/>
 
-        <ImageView
-            android:id="@+id/IVDailyStreak"
+        <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/daily_streaks__1_"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:padding="16dp"
+            android:background="#1E1E1E"
+            app:justifyContent="space_between"
+            app:alignItems="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daily Streak"
+                android:textColor="@color/white"
+                android:textSize="24sp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:src="@drawable/fire"/>
+                <TextView
+                    android:id="@+id/dailyStreak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="20"
+                    android:textColor="#FF9601"
+                    android:textSize="24sp"/>
+            </LinearLayout>
+
+        </com.google.android.flexbox.FlexboxLayout>
 
         <Space android:layout_width="match_parent" android:layout_height="19dp"/>
 
@@ -253,21 +284,13 @@
 
         </com.google.android.flexbox.FlexboxLayout>
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/IBClaim"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:background="#00FFFFFF"-->
-<!--            android:src="@drawable/frame_18"/>-->
-
         <Space android:layout_width="match_parent" android:layout_height="19dp"/>
 
         <ImageButton
             android:id="@+id/IBAchievements"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#00FFFFFF"
-            android:src="@drawable/daily_streaks__2_"/>
+            android:background="#00FFFFFF" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

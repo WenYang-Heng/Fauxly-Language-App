@@ -5,27 +5,25 @@
     android:id="@+id/course"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C212F"
-    tools:context=".CoursePage">
+    android:background="#1C212F">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="0dp"
-        android:layout_height="104dp"
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp">
 
         <TextView
             android:id="@+id/TVUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="19dp"
             android:text="TextView"
             android:textColor="#F7E4C3"
             android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/IVProfilePicture"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,7 +39,7 @@
             app:layout_constraintVertical_bias="0.509" />
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/backButton"
             android:layout_width="57dp"
             android:layout_height="56dp"
             android:layout_marginStart="16dp"
@@ -53,69 +51,45 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="112dp"
-        android:layout_marginTop="2dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/course_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+        app:layout_constraintTop_toBottomOf="@id/header">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="95dp"
-            android:orientation="horizontal">
-
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
             <TextView
-                android:id="@+id/TVCourseTitle5"
-                android:layout_width="495dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:paddingStart="20dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="0dp"
+                android:id="@+id/TVCourseTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Course"
                 android:textColor="#F7E4C3"
-                android:textSize="50sp" />
+                android:textSize="40sp" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/TVLevel"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/TVLevel3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:paddingTop="25dp"
-                    android:paddingEnd="25dp"
-                    android:text="LEVEL"
-                    android:textColor="#F7E4C3"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
+                android:layout_height="wrap_content"
+                android:text="LEVEL"
+                android:textColor="#F7E4C3"
+                android:textSize="16sp"
+                android:gravity="right"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="410dp"
-        android:layout_height="697dp"
-        android:layout_marginTop="1dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="14dp" />
+        app:layout_constraintTop_toBottomOf="@+id/course_info">
 
         <ImageView
             android:id="@+id/imageView"
@@ -129,93 +103,77 @@
             android:layout_width="match_parent"
             android:layout_height="14dp" />
 
-        <FrameLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="190dp"
-            android:background="#FAFAFA">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:background="@drawable/word_rounded_corners"
+            android:divider="@drawable/word_horizontal_divider"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:showDividers="middle">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="Today's Word"
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:divider="@drawable/word_vertical_divider"
+                android:gravity="center"
+                android:showDividers="middle">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/word"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:singleLine="false"
+                        android:text="Romanization"
+                        android:textSize="34sp"
+                        android:textColor="@color/black"/>
+
+                    <ImageButton
+                        android:id="@+id/imageButton5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#00FFFFFF"
+                        android:src="@drawable/sound_max_fill" />
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/translatedWord"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:paddingTop="10dp"
-                    android:text="Today's Word"
-                    android:textSize="18sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="211dp"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/textView2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Word"
-                            android:textSize="34sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.431"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.279" />
-
-                        <TextView
-                            android:id="@+id/textView3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="84dp"
-                            android:text="Romanization"
-                            app:layout_constraintStart_toStartOf="@+id/textView2"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <ImageButton
-                            android:id="@+id/imageButton5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="36dp"
-                            android:layout_marginBottom="52dp"
-                            android:background="#00FFFFFF"
-                            android:src="@drawable/sound_max_fill"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/textView4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="48dp"
-                            android:layout_marginTop="44dp"
-                            android:text="Translation"
-                            android:textSize="20sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </LinearLayout>
+                    android:text="Word"
+                    android:textSize="34sp"
+                    android:textColor="@color/black"/>
             </LinearLayout>
-        </FrameLayout>
+        </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="14dp" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/lessonBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00FFFFFF"
@@ -226,7 +184,7 @@
             android:layout_height="14dp" />
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/wordBankBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00FFFFFF"
@@ -237,7 +195,7 @@
             android:layout_height="14dp" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/flashCardBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00FFFFFF"

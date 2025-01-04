@@ -7,11 +7,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +27,10 @@ public class HomeFragment extends Fragment {
     private DatabaseRepository repository;
     private String userId = "100";
     private UserStats stats;
+    private User user;
+    private TextView TVUsername;
+    private TextView dailyStreak;
+    private ImageButton IBCourse;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,11 +45,43 @@ public class HomeFragment extends Fragment {
         day5 = view.findViewById(R.id.day5);
 
         repository = new DatabaseRepository(getContext());
+        TVUsername = view.findViewById(R.id.TVUsername);
+        dailyStreak = view.findViewById(R.id.dailyStreak);
+        IBCourse = view.findViewById(R.id.IBCourse);
+
+        IBCourse.setOnClickListener(v -> {
+            navigateToCourseFragment();
+        });
+
+        fetchUser();
 
         // Fetch user streak and set up the UI
         fetchUserStats();
 
+        if(user != null) {
+            TVUsername.setText(user.getName());
+        }
+
         return view;
+    }
+
+    private void navigateToCourseFragment() {
+        Fragment courseFragment = new CoursePageFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("userId", userId);
+        courseFragment.setArguments(bundle);
+
+        // Replace the current fragment with the new one
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container_view, courseFragment) // Replace with your FrameLayout ID
+                .addToBackStack(null) // Add to back stack for back navigation
+                .commit();
+    }
+
+    private void fetchUser() {
+        user = repository.getUserById(Integer.parseInt(userId));
     }
 
     private void fetchUserStats() {
@@ -97,6 +136,11 @@ public class HomeFragment extends Fragment {
         resetDayUI(day3);
         resetDayUI(day4);
         resetDayUI(day5);
+
+        // Update daily streak value
+        if (stats != null) {
+            dailyStreak.setText(String.valueOf(stats.getTotalLoginStreak())); // Convert to String
+        }
 
         // Update claimed days
         if (fiveDayLoginStreak >= 1) setDayClaimed(day1);

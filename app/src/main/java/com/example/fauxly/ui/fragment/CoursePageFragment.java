@@ -2,65 +2,131 @@ package com.example.fauxly.ui.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.fauxly.R;
+import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.model.User;
+import com.example.fauxly.model.UserLanguage;
+import com.example.fauxly.model.UserStats;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CoursePageFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CoursePageFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String userId;
+    private User user;
+    private UserLanguage userLanguage;
+    private ImageButton backButton, lessonBtn;
+    private TextView TVUsername, TVLanguage, TVLevel;
+    private DatabaseRepository repository;
 
     public CoursePageFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CoursePageFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CoursePageFragment newInstance(String param1, String param2) {
-        CoursePageFragment fragment = new CoursePageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Retrieve the user ID from the Bundle
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            userId = getArguments().getString("userId");
         }
+
+        repository = new DatabaseRepository(requireContext());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_course_page, container, false);
+        View view = inflater.inflate(R.layout.fragment_course_page, container, false);
+
+        // Initialize UI elements
+        backButton = view.findViewById(R.id.backButton);
+        TVUsername = view.findViewById(R.id.TVUsername);
+        TVLanguage = view.findViewById(R.id.TVCourseTitle);
+        TVLevel = view.findViewById(R.id.TVLevel);
+        lessonBtn = view.findViewById(R.id.lessonBtn);
+
+        // Set up back button click listener
+        backButton.setOnClickListener(v -> navigateBackToHome());
+
+        // Set up lesson button click listener
+        lessonBtn.setOnClickListener(v -> navigateToLessonList());
+
+        // Load user data
+        loadUserData();
+
+        return view;
+    }
+
+    private void navigateBackToHome() {
+        // Navigate back to the HomeFragment
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        fragmentManager.popBackStack(); // Navigates to the previous fragment in the stack
+    }
+
+    private void navigateToLessonList() {
+        if (userId != null && userLanguage != null) {
+            // Pass userId, languageId, and proficiencyLevel to LessonListFragment
+            Fragment lessonListFragment = LessonListFragment.newInstance(
+                    userId,
+                    userLanguage.getLanguageId(),
+                    userLanguage.getProficiencyLevel()
+            );
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, lessonListFragment) // Replace with your container ID
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
+    private void loadUserData() {
+        if (userId != null) {
+            // Fetch user and user language information
+            user = repository.getUserById(Integer.parseInt(userId));
+            userLanguage = repository.getUserLanguageByUserId(Integer.parseInt(userId));
+
+            // Update UI with user details
+            if (user != null) {
+                TVUsername.setText(user.getName());
+            }
+
+            if (userLanguage != null) {
+                TVLanguage.setText(userLanguage.getLanguageName());
+
+                String proficiency = userLanguage.getProficiencyLevel();
+                String proficiencyLabel;
+
+                switch (proficiency) {
+                    case "B":
+                        proficiencyLabel = "Beginner";
+                        break;
+                    case "I":
+                        proficiencyLabel = "Intermediate";
+                        break;
+                    case "A":
+                        proficiencyLabel = "Advanced";
+                        break;
+                    default:
+                        proficiencyLabel = "Unknown";
+                        break;
+                }
+
+                TVLevel.setText(proficiencyLabel);
+            } else {
+                TVLanguage.setText("Not Assigned");
+                TVLevel.setText("N/A");
+            }
+        }
     }
 }

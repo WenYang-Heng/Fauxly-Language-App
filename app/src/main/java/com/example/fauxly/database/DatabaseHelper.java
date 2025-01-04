@@ -138,6 +138,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO user_stats (user_id, current_level, total_xp, current_xp, level_up_xp, words_learned, total_login_streak, five_day_login_streak, last_claim_date) " +
                 "VALUES (100, 1, 0, 0, 1000, 0, 0, 0, NULL);");
 
+        // Insert default test user's language with proficiency level "Beginner" (level "B")
+        db.execSQL("INSERT INTO user_language (user_id, language_id, proficiency_level) " +
+                "VALUES (100, 1, 'B');");
+
         android.util.Log.d("DatabaseHelper", "Default test user and stats inserted.");
     }
 
@@ -150,16 +154,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void insertDefaultLessons(SQLiteDatabase db) {
         // Insert lessons into the lesson table
         db.execSQL("INSERT INTO lesson (lesson_id, level, lesson_number, language_id, lesson_title) " +
-                "VALUES ('BL1', 'Beginner', 1, 1, 'Japanese Writing Systems');");
+                "VALUES ('BL1', 'B', 1, 1, 'Japanese Writing Systems');");
 
         db.execSQL("INSERT INTO lesson (lesson_id, level, lesson_number, language_id, lesson_title) " +
-                "VALUES ('BL2', 'Beginner', 2, 1, 'Basic Greetings');");
+                "VALUES ('BL2', 'B', 2, 1, 'Basic Greetings');");
 
         db.execSQL("INSERT INTO lesson (lesson_id, level, lesson_number, language_id, lesson_title) " +
-                "VALUES ('BL3', 'Beginner', 3, 1, 'Numbers and Time');");
+                "VALUES ('BL3', 'B', 3, 1, 'Numbers and Time');");
 
         db.execSQL("INSERT INTO lesson (lesson_id, level, lesson_number, language_id, lesson_title) " +
-                "VALUES ('BL4', 'Beginner', 4, 1, 'Self-Introduction');");
+                "VALUES ('BL4', 'B', 4, 1, 'Self-Introduction');");
 
         android.util.Log.d("DatabaseHelper", "Default lessons inserted.");
     }

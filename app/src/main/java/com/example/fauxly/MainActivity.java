@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Delete the entire database
-//        boolean isDeleted = deleteDatabase("MAD2007.db");
-//
-//        if (isDeleted) {
-//            Log.d("DatabaseTest", "Database deleted successfully.");
-//        } else {
-//            Log.d("DatabaseTest", "Failed to delete the database or it does not exist.");
-//        }
+        boolean isDeleted = deleteDatabase("MAD2007.db");
+
+        if (isDeleted) {
+            Log.d("DatabaseTest", "Database deleted successfully.");
+        } else {
+            Log.d("DatabaseTest", "Failed to delete the database or it does not exist.");
+        }
 
 //         Reinitialize the database
         DatabaseHelper dbHelper = new DatabaseHelper(this);

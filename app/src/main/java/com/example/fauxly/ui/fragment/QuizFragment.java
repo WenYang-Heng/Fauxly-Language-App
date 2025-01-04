@@ -73,12 +73,12 @@ public class QuizFragment extends Fragment {
 
         repository = new DatabaseRepository(getContext());
 
-        String id = "BL3";
+        String lessonId = getArguments() != null ? getArguments().getString("lessonId") : null;
 
         // Check ID format to determine whether to load a lesson or quiz
-        if (isLessonId(id)) {
-            loadLessonContent(id, questionText, lessonTitle, nextButton, audioButton);
-        } else if (isQuizId(id)) {
+        if (isLessonId(lessonId)) {
+            loadLessonContent(lessonId, questionText, lessonTitle, nextButton, audioButton);
+        } else if (isQuizId(lessonId)) {
             loadQuiz();
         } else {
             lessonTitle.setText("Invalid ID format");
