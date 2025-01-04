@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Fauxly"
+rootProject.name = "login"
 include(":app")
  
