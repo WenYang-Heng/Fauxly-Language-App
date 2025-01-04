@@ -61,8 +61,14 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/flashcardView"
         android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="-2dp"
-        tools:layout_editor_absoluteY="301dp" />
+        android:layout_height="300dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.613" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
