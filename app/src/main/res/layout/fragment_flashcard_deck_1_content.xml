@@ -37,7 +37,7 @@
         android:id="@+id/flashcardID"
         android:layout_width="403dp"
         android:layout_height="94dp"
-        android:layout_marginTop="124dp"
+        android:layout_marginTop="84dp"
         android:text="Furniture"
         android:textAlignment="center"
         android:textColor="#F7E4C3"
