@@ -91,17 +91,18 @@ public class LessonListFragment extends Fragment {
         List<Lesson> lessons = repository.getLessonsByProficiencyAndLanguage(proficiencyLevel, languageId);
 
         if (lessons != null && !lessons.isEmpty()) {
-            lessonAdapter = new LessonAdapter(lessons, lessonId -> navigateToQuizFragment(lessonId));
+            lessonAdapter = new LessonAdapter(lessons, lesson -> navigateToQuizFragment(lesson.getLessonId(), lesson.getLessonTitle()));
             lessonRecyclerView.setAdapter(lessonAdapter);
         } else {
-            // Handle empty state
             System.out.println("No lessons found.");
         }
     }
 
-    private void navigateToQuizFragment(String lessonId) {
+
+    private void navigateToQuizFragment(String lessonId, String lessonTitle) {
         Bundle bundle = new Bundle();
         bundle.putString("lessonId", lessonId);
+        bundle.putString("lessonTitle", lessonTitle);
 
         QuizFragment quizFragment = new QuizFragment();
         quizFragment.setArguments(bundle);
@@ -109,8 +110,8 @@ public class LessonListFragment extends Fragment {
         // Navigate to QuizFragment
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container_view, quizFragment) // Replace with your container ID
-                .addToBackStack(null)
+                .replace(R.id.fragment_container_view, quizFragment)
+                .addToBackStack("LessonListFragment")
                 .commit();
     }
 }

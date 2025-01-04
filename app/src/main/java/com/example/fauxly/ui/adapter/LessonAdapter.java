@@ -16,11 +16,15 @@ import java.util.List;
 public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonViewHolder> {
 
     private final List<Lesson> lessons;
-    private final OnLessonClickListener listener;
+    private final OnLessonClickListener onLessonClickListener;
 
-    public LessonAdapter(List<Lesson> lessons, OnLessonClickListener listener) {
+    public interface OnLessonClickListener {
+        void onLessonClick(Lesson lesson);
+    }
+
+    public LessonAdapter(List<Lesson> lessons, OnLessonClickListener onLessonClickListener) {
         this.lessons = lessons;
-        this.listener = listener;
+        this.onLessonClickListener = onLessonClickListener;
     }
 
     @NonNull
@@ -34,13 +38,7 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
     public void onBindViewHolder(@NonNull LessonViewHolder holder, int position) {
         Lesson lesson = lessons.get(position);
         holder.lessonTitle.setText(lesson.getLessonTitle());
-
-        // Set click listener for each item
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onLessonClick(lesson.getLessonId());
-            }
-        });
+        holder.itemView.setOnClickListener(v -> onLessonClickListener.onLessonClick(lesson));
     }
 
     @Override
@@ -48,16 +46,13 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         return lessons.size();
     }
 
-    public static class LessonViewHolder extends RecyclerView.ViewHolder {
+    static class LessonViewHolder extends RecyclerView.ViewHolder {
         TextView lessonTitle;
 
-        public LessonViewHolder(@NonNull View itemView) {
+        LessonViewHolder(View itemView) {
             super(itemView);
-            lessonTitle = itemView.findViewById(R.id.lessonTitle); // Match the ID in lesson_item.xml
+            lessonTitle = itemView.findViewById(R.id.lessonTitle);
         }
     }
-
-    public interface OnLessonClickListener {
-        void onLessonClick(String lessonId);
-    }
 }
+

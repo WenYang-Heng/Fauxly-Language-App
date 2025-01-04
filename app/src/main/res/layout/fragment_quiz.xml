@@ -9,16 +9,28 @@
     style="@style/WhiteText"
     android:padding="16dp">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="52dp"
+        app:iconGravity="textStart"
+        android:text="Lesson"
+        android:background="@android:color/transparent"
+        app:icon="@drawable/back_icon_wrapper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/quizTitle"
+        style="@style/WhiteText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Quiz"
         android:textSize="24sp"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        style="@style/WhiteText"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/lessonTitle"
@@ -26,7 +38,7 @@
         android:layout_height="wrap_content"
         android:text="Lesson 1 - Grammar"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/quizTitle"
+        app:layout_constraintTop_toBottomOf="@id/backButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         style="@style/WhiteText"
@@ -163,15 +175,30 @@
         android:background="@drawable/quiz_confirm_button"
         app:backgroundTint="#00BFA6"/>
 
-    <Button
-        android:id="@+id/nextButton"
+    <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:background="@drawable/quiz_confirm_button"
-        app:backgroundTint="#00BFA6"/>
+        app:layout_constraintRight_toRightOf="parent">
+
+        <Button
+            android:id="@+id/prevButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Previous"
+            android:background="@drawable/quiz_confirm_button"
+            app:backgroundTint="#00BFA6"
+            android:layout_marginRight="10dp"/>
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:background="@drawable/quiz_confirm_button"
+            app:backgroundTint="#00BFA6"
+            android:layout_marginLeft="10dp"/>
+    </com.google.android.flexbox.FlexboxLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

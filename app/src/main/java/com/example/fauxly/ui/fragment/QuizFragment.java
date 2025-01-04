@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.Lesson;
 import com.example.fauxly.model.LessonContent;
+import com.google.android.material.button.MaterialButton;
 
 import org.w3c.dom.Text;
 
@@ -36,91 +38,125 @@ public class QuizFragment extends Fragment {
     private RadioGroup answersGroup;
     private Button confirmButton;
     private Button nextButton;
+    private Button prevButton;
     private Button audioButton;
+    private MaterialButton backButton;
     private TextView feedbackTextView;
     private TextView questionText;
     private TextView wordsTextView;
     private TextView pronunciationTextView;
+    private TextView lessonTitleTV;
 
-    public QuizFragment() {
-        // Required empty public constructor
-        super(R.layout.fragment_quiz);
-    }
-    private String correctColor = "#AFDC9C";
-    private String incorrectColor = "#FF9393";
-    private String correctTextColor = "#2B7A0A";
-    private String incorrectTextColor = "#BA2828";
     private DatabaseRepository repository;
 
+    private List<LessonContent> contents;
+    private int currentIndex = 0; // Track current content index
+    private String lessonId;
+
+    public QuizFragment() {
+        super(R.layout.fragment_quiz);
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_quiz, container, false);
 
+        // Initialize views
         answersGroup = rootView.findViewById(R.id.answersGroup);
         confirmButton = rootView.findViewById(R.id.confirmButton);
         nextButton = rootView.findViewById(R.id.nextButton);
+        prevButton = rootView.findViewById(R.id.prevButton);
+        backButton = rootView.findViewById(R.id.backButton);
         audioButton = rootView.findViewById(R.id.audioButton);
         feedbackTextView = rootView.findViewById(R.id.feedbackTextView);
         questionText = rootView.findViewById(R.id.questionText);
         wordsTextView = rootView.findViewById(R.id.wordsTextView);
         pronunciationTextView = rootView.findViewById(R.id.pronunciationTextView);
-        TextView lessonTitle = rootView.findViewById(R.id.lessonTitle);
-        Button audioButton = rootView.findViewById(R.id.audioButton);
+        lessonTitleTV = rootView.findViewById(R.id.lessonTitle);
 
         confirmButton.setVisibility(View.GONE);
 
         repository = new DatabaseRepository(getContext());
 
-        String lessonId = getArguments() != null ? getArguments().getString("lessonId") : null;
+        // Retrieve arguments
+        Bundle args = getArguments();
+        if (args != null) {
+            lessonId = args.getString("lessonId");
+            String lessonTitle = args.getString("lessonTitle");
 
-        // Check ID format to determine whether to load a lesson or quiz
-        if (isLessonId(lessonId)) {
-            loadLessonContent(lessonId, questionText, lessonTitle, nextButton, audioButton);
-        } else if (isQuizId(lessonId)) {
-            loadQuiz();
-        } else {
-            lessonTitle.setText("Invalid ID format");
+            // Set the lesson title
+            if (lessonTitle != null) {
+                lessonTitleTV.setText(lessonTitle);
+            }
         }
 
-        confirmButton.setOnClickListener(v -> {
-            int selectedId = answersGroup.getCheckedRadioButtonId();
-            checkAnswer(selectedId);
+        // Load lesson content
+        if (lessonId != null && isLessonId(lessonId)) {
+            loadLessonContent(lessonId);
+        } else if (lessonId != null && isQuizId(lessonId)) {
+            loadQuiz();
+        } else {
+            lessonTitleTV.setText("Invalid ID format");
+        }
+
+        // Back button functionality
+        backButton.setOnClickListener(v -> navigateBackToLessonList());
+
+        // Previous button click listener
+        prevButton.setOnClickListener(v -> {
+            if (currentIndex > 0) {
+                currentIndex--; // Move to the previous content
+                displayLessonContent(currentIndex);
+            }
+        });
+
+        // Next button click listener
+        nextButton.setOnClickListener(v -> {
+            if (currentIndex < contents.size() - 1) {
+                currentIndex++; // Move to the next content
+                displayLessonContent(currentIndex);
+            } else {
+                navigateToQuizCompletedFragment(lessonTitleTV.getText().toString());
+            }
         });
 
         return rootView;
     }
 
-    private void loadLessonContent(String lessonId, TextView questionText, TextView lessonTitle,
-                            Button nextButton, Button audioButton) {
-        List<LessonContent> contents = repository.getLessonContents(lessonId);
+    private void loadLessonContent(String lessonId) {
+        contents = repository.getLessonContents(lessonId);
 
         if (contents.isEmpty()) {
-            lessonTitle.setText("No content found for this lesson");
+            lessonTitleTV.setText("No content found for this lesson");
             nextButton.setVisibility(View.GONE);
+            prevButton.setVisibility(View.GONE);
             return;
         }
 
-        // Track current content index
-        final int[] currentIndex = {0};
+        // Display the first content
+        displayLessonContent(currentIndex);
 
-        // Load the first content item
-        displayLessonContent(contents, currentIndex[0], questionText, lessonTitle, audioButton);
-
-        // Next button click listener
         nextButton.setOnClickListener(v -> {
-            currentIndex[0]++;
-            if (currentIndex[0] < contents.size()) {
-                displayLessonContent(contents, currentIndex[0], questionText, lessonTitle, audioButton);
+            if (currentIndex < contents.size() - 1) {
+                currentIndex++;
+                displayLessonContent(currentIndex);
             } else {
-                navigateToQuizCompletedFragment(lessonTitle.getText().toString());
+                // Navigate to Quiz Completed Page on the last content
+                navigateToQuizCompletedFragment(lessonTitleTV.getText().toString());
+            }
+        });
+
+        // Previous button click listener
+        prevButton.setOnClickListener(v -> {
+            if (currentIndex > 0) {
+                currentIndex--;
+                displayLessonContent(currentIndex);
             }
         });
     }
 
-    private void displayLessonContent(List<LessonContent> contents, int index, TextView questionText,
-                                      TextView lessonTitle, Button audioButton) {
+    private void displayLessonContent(int index) {
         LessonContent content = contents.get(index);
 
         // Reset visibility
@@ -154,14 +190,23 @@ public class QuizFragment extends Fragment {
                 break;
 
             case "Image":
-                // Handle image content (if needed)
+
                 break;
 
             default:
                 break;
         }
-    }
 
+        if (index == contents.size() - 1) {
+            nextButton.setText("Finish"); // Change text to "Finish" on the last content
+        } else {
+            nextButton.setText("Next"); // Reset text to "Next" for other contents
+        }
+
+
+        prevButton.setEnabled(index > 0); // Disable on the first content
+        nextButton.setEnabled(index < contents.size()); // Enable for all valid contents
+    }
 
     private void playAudio(String audioPath) {
         int resId = getResources().getIdentifier(audioPath, "raw", getContext().getPackageName());
@@ -174,55 +219,33 @@ public class QuizFragment extends Fragment {
         }
     }
 
-
-
     private void loadQuiz() {
-
-    }
-
-
-    private void checkAnswer(int selectedId) {
-        String correctAnswer = "Answer C"; // need to get correct answer from database
-        RadioButton selectedRadioButton = answersGroup.findViewById(selectedId);
-        if (selectedRadioButton != null) {
-            if (selectedRadioButton.getText().equals(correctAnswer)) {
-                feedbackTextView.setText("You got it right!");
-                updateFeedbackBackground(correctColor, correctTextColor);
-            } else {
-                feedbackTextView.setText("That is incorrect! Correct Answer: " + correctAnswer);
-                updateFeedbackBackground(incorrectColor, incorrectTextColor);
-            }
-        }
-        feedbackTextView.setVisibility(View.VISIBLE);
-    }
-
-    private void updateFeedbackBackground(String backgroundColor, String textColor){
-        GradientDrawable background = (GradientDrawable) ContextCompat.getDrawable(getContext(), R.drawable.rounded_corners);
-        background.setColor(Color.parseColor(backgroundColor));
-        feedbackTextView.setTextColor(Color.parseColor(textColor));
-        feedbackTextView.setBackground(background);
+        // Add quiz loading logic here
     }
 
     private boolean isLessonId(String id) {
-        return id.matches("^(BL|IL)\\d+$"); // Matches BL1, BL2, ..., IL1, IL2, etc.
+        return id != null && id.matches("^(BL|IL)\\d+$");
     }
 
     private boolean isQuizId(String id) {
-        return id.matches("^(BQZ|IQZ)\\d+$"); // Matches BQZ1, BQZ2, ..., IQZ1, IQZ2, etc.
+        return id != null && id.matches("^(BQZ|IQZ)\\d+$");
+    }
+
+    private void navigateBackToLessonList() {
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        fragmentManager.popBackStack();
     }
 
     private void navigateToQuizCompletedFragment(String lessonTitle) {
         Bundle bundle = new Bundle();
-        bundle.putString("lessonTitle", lessonTitle); // Pass the lesson title
+        bundle.putString("lessonTitle", lessonTitle);
 
         QuizCompletedFragment completedFragment = new QuizCompletedFragment();
         completedFragment.setArguments(bundle);
 
-        // Navigate to QuizCompletedFragment
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container_view, completedFragment) // Replace with your container ID
+                .replace(R.id.fragment_container_view, completedFragment)
                 .addToBackStack(null)
                 .commit();
     }
-
 }
