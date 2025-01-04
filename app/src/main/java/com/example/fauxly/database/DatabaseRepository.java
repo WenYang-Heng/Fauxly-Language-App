@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.fauxly.model.FlashCard;
+import com.example.fauxly.model.FlashCardItem;
 import com.example.fauxly.model.Lesson;
 import com.example.fauxly.model.LessonContent;
 import com.example.fauxly.model.User;
@@ -212,6 +214,115 @@ public class DatabaseRepository {
         }
 
         return userLanguage;
+    }
+
+    public List<FlashCard> getFlashCardsByUserId(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<FlashCard> flashCards = new ArrayList<>();
+
+        // Query to fetch flashcards for the given user
+        String query = "SELECT flashcard_id, name FROM flashcard WHERE user_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                int flashcardId = cursor.getInt(cursor.getColumnIndexOrThrow("flashcard_id"));
+                String flashcardName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+
+                // Count the number of items in each flashcard
+                int itemCount = getFlashCardItemCount(flashcardId);
+
+                // Add the flashcard to the list
+                flashCards.add(new FlashCard(flashcardId, flashcardName, itemCount));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return flashCards;
+    }
+
+    // Helper method to count the number of items in a flashcard
+    private int getFlashCardItemCount(int flashcardId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) AS itemCount FROM flashcard_content WHERE flashcard_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(flashcardId)});
+
+        int itemCount = 0;
+        if (cursor.moveToFirst()) {
+            itemCount = cursor.getInt(cursor.getColumnIndexOrThrow("itemCount"));
+        }
+        cursor.close();
+
+        return itemCount;
+    }
+
+    public List<FlashCardItem> getFlashCardItemsByFlashCardId(int flashCardId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<FlashCardItem> flashCardItems = new ArrayList<>();
+
+        // Query to fetch flashcard items for the given flashCardId
+        String query = "SELECT card_id, word, pronunciation, translation, path, flashcard_id FROM flashcard_content WHERE flashcard_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(flashCardId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                flashCardItems.add(new FlashCardItem(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("card_id")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("word")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("pronunciation")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("translation")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("path")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("flashcard_id"))
+                ));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return flashCardItems;
+    }
+
+    public void insertFlashCard(String name, int userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("user_id", userId);
+
+        long newRowId = db.insert("flashcard", null, values);
+        if (newRowId != -1) {
+            android.util.Log.d("DatabaseRepository", "Flashcard inserted successfully with ID: " + newRowId);
+        } else {
+            android.util.Log.e("DatabaseRepository", "Error inserting flashcard.");
+        }
+    }
+
+    public void insertFlashCardContent(int flashCardId, String word, String pronunciation, String translation, String path) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("word", word);
+        values.put("pronunciation", pronunciation);
+        values.put("translation", translation);
+        values.put("path", path);
+        values.put("flashcard_id", flashCardId);
+
+        long newRowId = db.insert("flashcard_content", null, values);
+        if (newRowId != -1) {
+            android.util.Log.d("DatabaseRepository", "Flashcard content inserted successfully for FlashCard ID: " + flashCardId);
+        } else {
+            android.util.Log.e("DatabaseRepository", "Error inserting flashcard content.");
+        }
+    }
+
+
+    public void deleteFlashCardById(int flashCardId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Delete flashcard content first
+        db.delete("flashcard_content", "flashcard_id = ?", new String[]{String.valueOf(flashCardId)});
+
+        // Delete the flashcard
+        db.delete("flashcard", "flashcard_id = ?", new String[]{String.valueOf(flashCardId)});
+
+        android.util.Log.d("DatabaseRepository", "Flashcard deleted successfully with ID: " + flashCardId);
     }
 
 

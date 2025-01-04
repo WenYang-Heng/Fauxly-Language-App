@@ -23,7 +23,7 @@ public class CoursePageFragment extends Fragment {
     private String userId;
     private User user;
     private UserLanguage userLanguage;
-    private ImageButton backButton, lessonBtn;
+    private ImageButton backButton, lessonBtn, flashCardBtn;
     private TextView TVUsername, TVLanguage, TVLevel;
     private DatabaseRepository repository;
 
@@ -54,12 +54,15 @@ public class CoursePageFragment extends Fragment {
         TVLanguage = view.findViewById(R.id.TVCourseTitle);
         TVLevel = view.findViewById(R.id.TVLevel);
         lessonBtn = view.findViewById(R.id.lessonBtn);
+        flashCardBtn = view.findViewById(R.id.flashCardBtn);
 
         // Set up back button click listener
         backButton.setOnClickListener(v -> navigateBackToHome());
 
         // Set up lesson button click listener
         lessonBtn.setOnClickListener(v -> navigateToLessonList());
+
+        flashCardBtn.setOnClickListener(v -> navigateToFlashCardList());
 
         // Load user data
         loadUserData();
@@ -85,6 +88,21 @@ public class CoursePageFragment extends Fragment {
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, lessonListFragment) // Replace with your container ID
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
+    private void navigateToFlashCardList() {
+        if (userId != null && userLanguage != null) {
+            // Pass userId and languageId to FlashCardFragment
+            Fragment flashCardFragment = FlashCardFragment.newInstance(
+                    userId
+            );
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, flashCardFragment) // Replace with your container ID
                     .addToBackStack(null)
                     .commit();
         }

@@ -37,6 +37,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(user_id) REFERENCES user(user_id)" +
                 ");");
 
+        // Create flashcard table
+        db.execSQL("CREATE TABLE flashcard (" +
+                "flashcard_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, " +
+                "user_id INTEGER, " +
+                "FOREIGN KEY(user_id) REFERENCES user(user_id));");
+
+        // Create flashcard_content table
+        db.execSQL("CREATE TABLE flashcard_content (" +
+                "card_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "word TEXT, " +
+                "pronunciation TEXT, " +
+                "translation TEXT, " +
+                "path TEXT, " +
+                "flashcard_id INTEGER, " +
+                "FOREIGN KEY(flashcard_id) REFERENCES flashcard(flashcard_id));");
+
         // language table
         db.execSQL("CREATE TABLE language (" +
                 "language_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -128,6 +145,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultLanguages(db);
         insertDefaultLessons(db);
         insertDefaultLessonContent(db);
+        insertDefaultFlashCards(db);
+    }
+
+    private void insertDefaultFlashCards(SQLiteDatabase db) {
+        // Insert default flashcards
+        db.execSQL("INSERT INTO flashcard (name, user_id) VALUES ('Basic Greetings', 100);");
+        db.execSQL("INSERT INTO flashcard (name, user_id) VALUES ('Furniture', 100);");
+
+        // Insert default flashcard contents
+        db.execSQL("INSERT INTO flashcard_content (word, pronunciation, translation, path, flashcard_id) VALUES ('안녕하세요', 'Annyeonghaseyo', 'Hello', NULL, 1);");
+        db.execSQL("INSERT INTO flashcard_content (word, pronunciation, translation, path, flashcard_id) VALUES ('감사합니다', 'Gamsahamnida', 'Thank you', NULL, 1);");
+        db.execSQL("INSERT INTO flashcard_content (word, pronunciation, translation, path, flashcard_id) VALUES ('의자', 'Uija', 'Chair', NULL, 2);");
+        db.execSQL("INSERT INTO flashcard_content (word, pronunciation, translation, path, flashcard_id) VALUES ('책상', 'Chaeksang', 'Desk', NULL, 2);");
+
+        android.util.Log.d("DatabaseHelper", "Default flashcards and contents inserted.");
     }
 
     private void insertDefaultTestUser(SQLiteDatabase db) {
