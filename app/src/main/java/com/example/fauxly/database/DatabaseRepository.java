@@ -54,6 +54,34 @@ public class DatabaseRepository {
         }
     }
 
+    public void insertUserLanguage(int userId, int languageId, String proficiencyLevel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Check if the user already has a language entry
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM user_language WHERE user_id = ?",
+                new String[]{String.valueOf(userId)}
+        );
+
+        ContentValues values = new ContentValues();
+        values.put("user_id", userId);
+        values.put("language_id", languageId);
+        values.put("proficiency_level", proficiencyLevel);
+
+        if (cursor.moveToFirst()) {
+            // Update the existing entry
+            db.update("user_language", values, "user_id = ?", new String[]{String.valueOf(userId)});
+        } else {
+            // Insert a new entry
+            db.insert("user_language", null, values);
+        }
+
+        cursor.close();
+        db.close();
+    }
+
+
+
     // Insert into question table
     public void insertQuestion(String questionId, String title, int sequence, int languageId, String lessonId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

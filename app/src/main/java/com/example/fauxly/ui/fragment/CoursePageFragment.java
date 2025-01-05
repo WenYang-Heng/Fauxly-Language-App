@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class CoursePageFragment extends Fragment {
     private User user;
     private UserLanguage userLanguage;
     private ImageButton backButton, lessonBtn, flashCardBtn;
+    private Button changeLanguageButton;
     private TextView TVUsername, TVLanguage, TVLevel;
     private DatabaseRepository repository;
 
@@ -50,6 +52,7 @@ public class CoursePageFragment extends Fragment {
 
         // Initialize UI elements
         backButton = view.findViewById(R.id.backButton);
+        changeLanguageButton = view.findViewById(R.id.changeLanguageButton);
         TVUsername = view.findViewById(R.id.TVUsername);
         TVLanguage = view.findViewById(R.id.TVCourseTitle);
         TVLevel = view.findViewById(R.id.TVLevel);
@@ -63,6 +66,8 @@ public class CoursePageFragment extends Fragment {
         lessonBtn.setOnClickListener(v -> navigateToLessonList());
 
         flashCardBtn.setOnClickListener(v -> navigateToFlashCardList());
+
+        changeLanguageButton.setOnClickListener(v -> navigateToLanguageSelection());
 
         // Load user data
         loadUserData();
@@ -104,6 +109,19 @@ public class CoursePageFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, flashCardFragment) // Replace with your container ID
                     .addToBackStack(null)
+                    .commit();
+        }
+    }
+
+    private void navigateToLanguageSelection() {
+        if (userId != null) {
+            // Navigate to LanguageSelectionFragment
+            Fragment languageSelectionFragment = LanguageSelectionFragment.newInstance(userId);
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, languageSelectionFragment)
+                    .addToBackStack("CoursePageFragment")
                     .commit();
         }
     }

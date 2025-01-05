@@ -64,10 +64,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE user_language (" +
                 "user_id INTEGER, " +
                 "language_id INTEGER, " +
-                "proficiency_level TEXT, " +  //  Beginner, Intermediate, Advanced
+                "proficiency_level TEXT, " +  // Beginner, Intermediate, Advanced
                 "FOREIGN KEY(user_id) REFERENCES user(user_id), " +
-                "FOREIGN KEY(language_id) REFERENCES language(language_id)" +
+                "FOREIGN KEY(language_id) REFERENCES language(language_id), " +
+                "UNIQUE(user_id, language_id) ON CONFLICT REPLACE" + // Prevent duplicates, replace on conflict
                 ");");
+
 
         // achievement table
         db.execSQL("CREATE TABLE achievement (" +
@@ -180,6 +182,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void insertDefaultLanguages(SQLiteDatabase db) {
         db.execSQL("INSERT INTO language (name) VALUES ('Japanese');");
+        db.execSQL("INSERT INTO language (name) VALUES ('Korean');");
         android.util.Log.d("DatabaseHelper", "Default language inserted.");
     }
 
