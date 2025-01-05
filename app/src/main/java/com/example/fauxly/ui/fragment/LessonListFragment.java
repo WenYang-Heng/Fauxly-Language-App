@@ -1,5 +1,6 @@
 package com.example.fauxly.ui.fragment;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -87,8 +88,8 @@ public class LessonListFragment extends Fragment {
     }
 
     private void loadLessons() {
-        // Fetch lessons based on languageId and proficiencyLevel
-        List<Lesson> lessons = repository.getLessonsByProficiencyAndLanguage(proficiencyLevel, languageId);
+        // Fetch lessons with completion status
+        List<Lesson> lessons = repository.getLessonsWithCompletionStatus(Integer.parseInt(userId), proficiencyLevel, languageId);
 
         if (lessons != null && !lessons.isEmpty()) {
             lessonAdapter = new LessonAdapter(lessons, lesson -> navigateToQuizFragment(lesson.getLessonId(), lesson.getLessonTitle()));
@@ -99,10 +100,19 @@ public class LessonListFragment extends Fragment {
     }
 
 
+
     private void navigateToQuizFragment(String lessonId, String lessonTitle) {
+
+        // Check if the lesson already exists in the user_lesson table
+        if (!repository.isUserLessonExists(Integer.parseInt(userId), lessonId)) {
+            // Insert only if it doesn't exist
+            repository.insertUserLesson(Integer.parseInt(userId), lessonId, 0); // Mark lesson as not complete
+        }
+
         Bundle bundle = new Bundle();
         bundle.putString("lessonId", lessonId);
         bundle.putString("lessonTitle", lessonTitle);
+        bundle.putString("userId", userId);
 
         QuizFragment quizFragment = new QuizFragment();
         quizFragment.setArguments(bundle);

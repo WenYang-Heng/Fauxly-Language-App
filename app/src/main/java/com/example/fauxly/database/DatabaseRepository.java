@@ -73,33 +73,60 @@ public class DatabaseRepository {
     }
 
     // Add similar methods for other tables...
-    public Lesson getLesson(String lessonId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Lesson lesson = null;
+//    public Lesson getLesson(String lessonId) {
+//        SQLiteDatabase db = dbHelper.getReadableDatabase();
+//        Lesson lesson = null;
+//
+//        Cursor cursor = db.rawQuery("SELECT * FROM lesson WHERE lesson_id = ?", new String[]{lessonId});
+//        if (cursor.moveToFirst()) {
+//            lesson = new Lesson(
+//                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_id")),
+//                    cursor.getString(cursor.getColumnIndexOrThrow("level")),
+//                    cursor.getInt(cursor.getColumnIndexOrThrow("lesson_number")),
+//                    cursor.getInt(cursor.getColumnIndexOrThrow("language_id")),
+//                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_title"))
+//            );
+//        }
+//        cursor.close();
+//        return lesson;
+//    }
 
-        Cursor cursor = db.rawQuery("SELECT * FROM lesson WHERE lesson_id = ?", new String[]{lessonId});
-        if (cursor.moveToFirst()) {
-            lesson = new Lesson(
-                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("level")),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("lesson_number")),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("language_id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("lesson_title"))
-            );
-        }
-        cursor.close();
-        return lesson;
-    }
+//    public List<Lesson> getLessonsByProficiencyAndLanguage(String proficiencyLevel, int languageId) {
+//        SQLiteDatabase db = dbHelper.getReadableDatabase();
+//        List<Lesson> lessons = new ArrayList<>();
+//
+//        // Build the query
+//        String query = "SELECT * FROM lesson WHERE level = ? AND language_id = ?";
+//        Cursor cursor = db.rawQuery(query, new String[]{proficiencyLevel, String.valueOf(languageId)});
+//
+//        // Iterate through the results and populate the list
+//        if (cursor.moveToFirst()) {
+//            do {
+//                lessons.add(new Lesson(
+//                        cursor.getString(cursor.getColumnIndexOrThrow("lesson_id")),
+//                        cursor.getString(cursor.getColumnIndexOrThrow("level")),
+//                        cursor.getInt(cursor.getColumnIndexOrThrow("lesson_number")),
+//                        cursor.getInt(cursor.getColumnIndexOrThrow("language_id")),
+//                        cursor.getString(cursor.getColumnIndexOrThrow("lesson_title"))
+//                ));
+//            } while (cursor.moveToNext());
+//        }
+//        cursor.close();
+//        return lessons;
+//    }
 
-    public List<Lesson> getLessonsByProficiencyAndLanguage(String proficiencyLevel, int languageId) {
+    public List<Lesson> getLessonsWithCompletionStatus(int userId, String proficiencyLevel, int languageId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<Lesson> lessons = new ArrayList<>();
 
-        // Build the query
-        String query = "SELECT * FROM lesson WHERE level = ? AND language_id = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{proficiencyLevel, String.valueOf(languageId)});
+        String query = "SELECT l.lesson_id, l.level, l.lesson_number, l.language_id, l.lesson_title, " +
+                "COALESCE(ul.isComplete, 0) AS isComplete " +
+                "FROM lesson l " +
+                "LEFT JOIN user_lesson ul ON l.lesson_id = ul.lesson_id AND ul.user_id = ? " +
+                "WHERE l.level = ? AND l.language_id = ?";
 
-        // Iterate through the results and populate the list
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), proficiencyLevel, String.valueOf(languageId)});
+
         if (cursor.moveToFirst()) {
             do {
                 lessons.add(new Lesson(
@@ -107,13 +134,15 @@ public class DatabaseRepository {
                         cursor.getString(cursor.getColumnIndexOrThrow("level")),
                         cursor.getInt(cursor.getColumnIndexOrThrow("lesson_number")),
                         cursor.getInt(cursor.getColumnIndexOrThrow("language_id")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("lesson_title"))
+                        cursor.getString(cursor.getColumnIndexOrThrow("lesson_title")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("isComplete")) == 1
                 ));
             } while (cursor.moveToNext());
         }
         cursor.close();
         return lessons;
     }
+
 
 
     public List<LessonContent> getLessonContents(String lessonId) {
@@ -136,6 +165,43 @@ public class DatabaseRepository {
         cursor.close();
         return contents;
     }
+
+    public boolean isUserLessonExists(int userId, String lessonId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(
+                "user_lesson",
+                new String[]{"user_id", "lesson_id"},
+                "user_id = ? AND lesson_id = ?",
+                new String[]{String.valueOf(userId), lessonId},
+                null, null, null
+        );
+
+        boolean exists = cursor.getCount() > 0; // Check if the cursor has results
+        cursor.close();
+        return exists;
+    }
+
+    public void insertUserLesson(int userId, String lessonId, int isComplete) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("user_id", userId);
+        values.put("lesson_id", lessonId);
+        values.put("isComplete", isComplete);
+
+        db.insert("user_lesson", null, values);
+    }
+
+    public void updateUserLessonCompletion(int userId, String lessonId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("isComplete", 1); // Set isComplete to true (1)
+
+        db.update("user_lesson", values, "user_id = ? AND lesson_id = ?", new String[]{String.valueOf(userId), lessonId});
+        db.close();
+    }
+
+
 
     // Get User by ID
     public User getUserById(int userId) {
@@ -330,6 +396,7 @@ public class DatabaseRepository {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("five_day_login_streak", 0);
+        values.put("total_login_streak", 0); // Reset total login streak
         values.put("last_claim_date", (String) null); // Reset last claim date
 
         db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
@@ -338,14 +405,27 @@ public class DatabaseRepository {
 
     public void updateUserStreakAndDate(int userId, int claimedDay, String currentDate) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Fetch current total login streak to increment it
+        Cursor cursor = db.query(
+                "user_stats",
+                new String[]{"total_login_streak"},
+                "user_id = ?",
+                new String[]{String.valueOf(userId)},
+                null, null, null);
+
+        int totalLoginStreak = 0;
+        if (cursor != null && cursor.moveToFirst()) {
+            totalLoginStreak = cursor.getInt(cursor.getColumnIndexOrThrow("total_login_streak"));
+            cursor.close();
+        }
+
         ContentValues values = new ContentValues();
         values.put("five_day_login_streak", claimedDay);
+        values.put("total_login_streak", totalLoginStreak + 1); // Increment total login streak
         values.put("last_claim_date", currentDate); // Update last claim date
 
         db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
         db.close();
     }
-
-
-
 }

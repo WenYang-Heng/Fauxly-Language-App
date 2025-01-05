@@ -66,13 +66,6 @@
             android:paddingStart="20dp"
             android:src="@drawable/rectangle_23"/>
 
-        <TextView
-            android:id="@+id/TVWordBank"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="20dp"
-            android:text="TextView"
-            android:textColor="#F7E4C3"/>
 
         <Space android:layout_width="match_parent" android:layout_height="19dp"/>
 

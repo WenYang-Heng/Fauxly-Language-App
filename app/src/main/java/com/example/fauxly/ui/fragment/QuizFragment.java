@@ -52,6 +52,7 @@ public class QuizFragment extends Fragment {
     private List<LessonContent> contents;
     private int currentIndex = 0; // Track current content index
     private String lessonId;
+    private String userId;
 
     public QuizFragment() {
         super(R.layout.fragment_quiz);
@@ -83,6 +84,7 @@ public class QuizFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             lessonId = args.getString("lessonId");
+            userId = args.getString("userId");
             String lessonTitle = args.getString("lessonTitle");
 
             // Set the lesson title
@@ -239,6 +241,8 @@ public class QuizFragment extends Fragment {
     private void navigateToQuizCompletedFragment(String lessonTitle) {
         Bundle bundle = new Bundle();
         bundle.putString("lessonTitle", lessonTitle);
+        bundle.putString("lessonId", lessonId);
+        bundle.putString("userId", userId);
 
         QuizCompletedFragment completedFragment = new QuizCompletedFragment();
         completedFragment.setArguments(bundle);

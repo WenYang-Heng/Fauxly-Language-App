@@ -1,5 +1,6 @@
 package com.example.fauxly.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,24 @@ public class HomeFragment extends Fragment {
     private TextView TVUsername;
     private TextView dailyStreak;
     private ImageButton IBCourse;
+
+    private OnUserIdChangeListener userIdChangeListener;
+
+    // Interface for communication
+    public interface OnUserIdChangeListener {
+        void onUserIdChanged(String newUserId);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnUserIdChangeListener) {
+            userIdChangeListener = (OnUserIdChangeListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnUserIdChangeListener");
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,6 +101,9 @@ public class HomeFragment extends Fragment {
 
     private void fetchUser() {
         user = repository.getUserById(Integer.parseInt(userId));
+        if (user != null && userIdChangeListener != null) {
+            userIdChangeListener.onUserIdChanged(String.valueOf(user.getUserId()));
+        }
     }
 
     private void fetchUserStats() {

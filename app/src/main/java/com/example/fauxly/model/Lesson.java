@@ -6,14 +6,16 @@ public class Lesson {
     private int lessonNumber;      // Lesson number
     private int languageId;        // Foreign key referencing the language table
     private String lessonTitle;    // Title of the lesson
+    private Boolean isComplete;
 
     // Constructor
-    public Lesson(String lessonId, String level, int lessonNumber, int languageId, String lessonTitle) {
+    public Lesson(String lessonId, String level, int lessonNumber, int languageId, String lessonTitle, boolean isComplete) {
         this.lessonId = lessonId;
         this.level = level;
         this.lessonNumber = lessonNumber;
         this.languageId = languageId;
         this.lessonTitle = lessonTitle;
+        this.isComplete = isComplete;
     }
 
     // Getters and Setters
@@ -55,6 +57,15 @@ public class Lesson {
 
     public void setLessonTitle(String lessonTitle) {
         this.lessonTitle = lessonTitle;
+    }
+
+    // Add getter and setter for isComplete
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(boolean complete) {
+        isComplete = complete;
     }
 
     @Override

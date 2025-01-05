@@ -15,16 +15,16 @@ import java.util.List;
 
 public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonViewHolder> {
 
-    private final List<Lesson> lessons;
-    private final OnLessonClickListener onLessonClickListener;
+    private final List<Lesson> lessonList;
+    private final OnLessonClickListener listener;
 
     public interface OnLessonClickListener {
         void onLessonClick(Lesson lesson);
     }
 
-    public LessonAdapter(List<Lesson> lessons, OnLessonClickListener onLessonClickListener) {
-        this.lessons = lessons;
-        this.onLessonClickListener = onLessonClickListener;
+    public LessonAdapter(List<Lesson> lessonList, OnLessonClickListener listener) {
+        this.lessonList = lessonList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,23 +36,33 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
 
     @Override
     public void onBindViewHolder(@NonNull LessonViewHolder holder, int position) {
-        Lesson lesson = lessons.get(position);
+        Lesson lesson = lessonList.get(position);
         holder.lessonTitle.setText(lesson.getLessonTitle());
-        holder.itemView.setOnClickListener(v -> onLessonClickListener.onLessonClick(lesson));
+
+        // Update UI based on completion status
+        if (lesson.isComplete()) {
+            holder.statusTextView.setText("Completed");
+        } else {
+            holder.statusTextView.setText("Not Completed");
+        }
+
+        holder.itemView.setOnClickListener(v -> listener.onLessonClick(lesson));
     }
 
     @Override
     public int getItemCount() {
-        return lessons.size();
+        return lessonList.size();
     }
 
     static class LessonViewHolder extends RecyclerView.ViewHolder {
-        TextView lessonTitle;
+        TextView lessonTitle, statusTextView;
 
-        LessonViewHolder(View itemView) {
+        public LessonViewHolder(@NonNull View itemView) {
             super(itemView);
             lessonTitle = itemView.findViewById(R.id.lessonTitle);
+            statusTextView = itemView.findViewById(R.id.lessonStatus); // Add this TextView in lesson_item.xml
         }
     }
 }
+
 

@@ -2,14 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="16dp"
     android:background="@drawable/achivement_background">
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        app:alignItems="center"
+        app:justifyContent="space_between"
         android:paddingStart="16dp">
 
         <TextView
@@ -20,5 +22,13 @@
             android:textColor="@android:color/white"
             android:text="Achievement Title" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/lessonStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not Completed"
+            android:textColor="#FF0000"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp" />
+    </com.google.android.flexbox.FlexboxLayout>
 </LinearLayout>
