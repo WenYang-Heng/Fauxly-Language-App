@@ -472,4 +472,17 @@ public class DatabaseRepository {
         db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
         db.close();
     }
+
+    public void updateUserStatsXpAndLevel(int userId, int currentXp, int currentLevel, int totalXp) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("current_xp", currentXp);
+        values.put("current_level", currentLevel);
+        values.put("total_xp", totalXp);
+
+        db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
+        db.close();
+    }
+
+
 }

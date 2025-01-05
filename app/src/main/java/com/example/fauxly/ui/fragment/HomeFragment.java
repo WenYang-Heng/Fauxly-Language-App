@@ -219,14 +219,37 @@ public class HomeFragment extends Fragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String currentDate = dateFormat.format(new Date());
 
+        // Add 200 XP
+        int xpGained = 200;
+        stats.setCurrentXp(stats.getCurrentXp() + xpGained);
+        stats.setTotalXp(stats.getTotalXp() + xpGained); // Update total XP
+
+        // Check if user needs to level up
+        if (stats.getCurrentXp() >= stats.getLevelUpXp()) {
+            stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp()); // Carry over remaining XP
+            stats.setCurrentLevel(stats.getCurrentLevel() + 1); // Increment the level
+
+            // Notify the user
+            Toast.makeText(getContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel(), Toast.LENGTH_SHORT).show();
+        }
+
+        // Update the database with new XP and level
+        repository.updateUserStatsXpAndLevel(
+                Integer.parseInt(userId),
+                stats.getCurrentXp(),
+                stats.getCurrentLevel(),
+                stats.getTotalXp()
+        );
+
         // Update the database to mark the day as claimed
         repository.updateUserStreakAndDate(Integer.parseInt(userId), dayNumber, currentDate);
 
-        // Fetch updated user stats
+        // Fetch updated user stats to refresh the UI
         fetchUserStats();
 
         // Notify the user
-        Toast.makeText(getContext(), "Day " + dayNumber + " claimed!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Day " + dayNumber + " claimed! You earned 200 XP!", Toast.LENGTH_SHORT).show();
     }
+
 
 }
