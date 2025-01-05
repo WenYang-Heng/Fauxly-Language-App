@@ -17,7 +17,7 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserLanguage;
-import com.example.fauxly.model.UserStats;
+import com.google.android.material.button.MaterialButton;
 
 public class CoursePageFragment extends Fragment {
 
@@ -26,6 +26,7 @@ public class CoursePageFragment extends Fragment {
     private UserLanguage userLanguage;
     private ImageButton backButton, lessonBtn, flashCardBtn;
     private Button changeLanguageButton;
+    private MaterialButton quizBtn;
     private TextView TVUsername, TVLanguage, TVLevel;
     private DatabaseRepository repository;
 
@@ -58,6 +59,7 @@ public class CoursePageFragment extends Fragment {
         TVLevel = view.findViewById(R.id.TVLevel);
         lessonBtn = view.findViewById(R.id.lessonBtn);
         flashCardBtn = view.findViewById(R.id.flashCardBtn);
+        quizBtn = view.findViewById(R.id.quizBtn);
 
         // Set up back button click listener
         backButton.setOnClickListener(v -> navigateBackToHome());
@@ -68,6 +70,7 @@ public class CoursePageFragment extends Fragment {
         flashCardBtn.setOnClickListener(v -> navigateToFlashCardList());
 
         changeLanguageButton.setOnClickListener(v -> navigateToLanguageSelection());
+        quizBtn.setOnClickListener(v -> navigateToQuizList());
 
         // Load user data
         loadUserData();
@@ -122,6 +125,22 @@ public class CoursePageFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, languageSelectionFragment)
                     .addToBackStack("CoursePageFragment")
+                    .commit();
+        }
+    }
+
+    private void navigateToQuizList() {
+        if (userId != null && userLanguage != null) {
+            Fragment quizListFragment = QuizListFragment.newInstance(
+                    userId,
+                    userLanguage.getLanguageId(),
+                    userLanguage.getProficiencyLevel()
+            );
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, quizListFragment)
+                    .addToBackStack(null)
                     .commit();
         }
     }

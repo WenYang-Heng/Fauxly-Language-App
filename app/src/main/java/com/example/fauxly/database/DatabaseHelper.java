@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "words_learned INTEGER, " +
                 "total_login_streak INTEGER, " +
                 "five_day_login_streak INTEGER, " +
-                "last_claim_date TEXT, " + // Include last_claim_date in schema
+                "last_claim_date TEXT, " +
                 "FOREIGN KEY(user_id) REFERENCES user(user_id)" +
                 ");");
 
@@ -64,10 +64,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE user_language (" +
                 "user_id INTEGER, " +
                 "language_id INTEGER, " +
-                "proficiency_level TEXT, " +  // Beginner, Intermediate, Advanced
+                "proficiency_level TEXT, " +  // B, I, A
                 "FOREIGN KEY(user_id) REFERENCES user(user_id), " +
                 "FOREIGN KEY(language_id) REFERENCES language(language_id), " +
-                "UNIQUE(user_id, language_id) ON CONFLICT REPLACE" + // Prevent duplicates, replace on conflict
+                "UNIQUE(user_id, language_id) ON CONFLICT REPLACE" + // Prevent duplicates, replace if duplicate
                 ");");
 
 
@@ -97,7 +97,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(language_id) REFERENCES language(language_id)" +
                 ");");
 
-        // lesson_content table
         db.execSQL("CREATE TABLE lesson_content (" +
                 "content_id INTEGER PRIMARY KEY AUTOINCREMENT, " +  // Auto-incrementing ID for each content piece
                 "lesson_id TEXT, " +
@@ -108,7 +107,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "word TEXT, " +  // Individual word (if applicable)
                 "pronunciation TEXT, " +  // English pronunciation for the word
                 "FOREIGN KEY(lesson_id) REFERENCES lesson(lesson_id)" +  // Links to lesson_id in lesson table
-                ");");
+                ");");      // lesson_content table
+
 
         // user_lesson table
         db.execSQL("CREATE TABLE user_lesson (" +
@@ -119,26 +119,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(lesson_id) REFERENCES lesson(lesson_id)" +
                 ");");
 
-
-        // Create the question table
-        db.execSQL("CREATE TABLE question (" +
-                "question_id TEXT PRIMARY KEY, " +  //  BL1Q1 for Beginner Lesson 1 Question 1
-                "title TEXT, " +
-                "sequence INTEGER, " +
+        // Quiz Table
+        db.execSQL("CREATE TABLE quiz (" +
+                "quiz_id TEXT PRIMARY KEY, " +
                 "language_id INTEGER, " +
-                "lesson_id TEXT, " +
-                "FOREIGN KEY(language_id) REFERENCES language(language_id), " +
-                "FOREIGN KEY(lesson_id) REFERENCES lesson(lesson_id)" +
+                "level TEXT, " +  // Level (B, I, A)
+                "quiz_title TEXT, " +
+                "FOREIGN KEY(language_id) REFERENCES language(language_id)" +
                 ");");
 
+        // Quiz Content Table
+        db.execSQL("CREATE TABLE quiz_content (" +
+                "content_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "quiz_id TEXT, " +
+                "sequence INTEGER, " +
+                "content_type TEXT DEFAULT 'question', " +  // Question, image, video, etc.
+                "title TEXT, " +  // The question title
+                "FOREIGN KEY(quiz_id) REFERENCES quiz(quiz_id)" +
+                ");");
 
-        // question_option table
-        db.execSQL("CREATE TABLE question_option (" +
-                "option_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "question_id TEXT, " +
+        // Option Table
+        db.execSQL("CREATE TABLE option (" +
+                "option_id INTEGER PRIMARY KEY AUTOINCREMENT, " +  // Auto-incrementing ID for each option
+                "content_id INTEGER, " +
                 "option_text TEXT, " +
-                "isCorrect INTEGER, " +
-                "FOREIGN KEY(question_id) REFERENCES question(question_id)" +
+                "is_correct INTEGER DEFAULT 0, " +  // Whether the option is correct (1 = true, 0 = false)
+                "FOREIGN KEY(content_id) REFERENCES quiz_content(content_id)" +
+                ");");
+
+        // User Quiz Table
+        db.execSQL("CREATE TABLE user_quiz (" +
+                "user_id INTEGER, " +
+                "quiz_id TEXT, " +
+                "isComplete INTEGER DEFAULT 0, " +  // 0 = not complete, 1 = complete
+                "FOREIGN KEY(user_id) REFERENCES user(user_id), " +
+                "FOREIGN KEY(quiz_id) REFERENCES quiz(quiz_id), " +
+                "PRIMARY KEY(user_id, quiz_id)" +
                 ");");
 
         android.util.Log.d("DatabaseHelper", "All tables created successfully.");
@@ -148,6 +164,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultLessons(db);
         insertDefaultLessonContent(db);
         insertDefaultFlashCards(db);
+        insertDefaultQuiz(db);
+        insertDefaultQuizContent(db);
+        insertDefaultQuizOption(db);
     }
 
     private void insertDefaultFlashCards(SQLiteDatabase db) {
@@ -244,8 +263,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         android.util.Log.d("DatabaseHelper", "Default lesson content with updated words and pronunciation inserted.");
     }
 
+    private void insertDefaultQuiz(SQLiteDatabase db) {
+        // Insert default quizzes for Japanese (language_id = 1)
+        db.execSQL("INSERT INTO quiz (quiz_id, language_id, level, quiz_title) VALUES " +
+                "('BQ1', 1, 'B', 'Japanese Beginner Quiz 1'), " +
+                "('BQ2', 1, 'B', 'Japanese Beginner Quiz 2'), " +
+                "('IQ1', 1, 'I', 'Japanese Intermediate Quiz 1'), " +
+                "('AQ1', 1, 'A', 'Japanese Advanced Quiz 1');");
+    }
 
+    private void insertDefaultQuizContent(SQLiteDatabase db) {
+        // Insert default quiz content for Japanese Beginner Quiz 1 (quiz_id = 'BQ1')
+        db.execSQL("INSERT INTO quiz_content (content_id, quiz_id, sequence, content_type, title) VALUES " +
+                "(1, 'BQ1', 1, 'question', 'What does “こんにちは” mean?'), " +
+                "(2, 'BQ1', 2, 'question', 'What is the correct pronunciation of “ありがとう”?');");
+    }
 
+    private void insertDefaultQuizOption(SQLiteDatabase db) {
+        // Insert default options for content_id 1 (Quiz Question 1)
+        db.execSQL("INSERT INTO option (content_id, option_text, is_correct) VALUES " +
+                "(1, 'Good Morning', 0), " +
+                "(1, 'Good Afternoon', 1), " +
+                "(1, 'Good Evening', 0), " +
+                "(1, 'Hello', 0);");
+
+        // Insert default options for content_id 2 (Quiz Question 2)
+        db.execSQL("INSERT INTO option (content_id, option_text, is_correct) VALUES " +
+                "(2, 'Arigatou', 1), " +
+                "(2, 'Aregato', 0), " +
+                "(2, 'Arugato', 0), " +
+                "(2, 'Arikato', 0);");
+    }
 
     private void insertDefaultAchievementData(SQLiteDatabase db) {
 
@@ -264,6 +312,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS question_option;");
         db.execSQL("DROP TABLE IF EXISTS language;");
         db.execSQL("DROP TABLE IF EXISTS user_language;");
+        db.execSQL("DROP TABLE IF EXISTS quiz;");
+        db.execSQL("DROP TABLE IF EXISTS quiz_content;");
+        db.execSQL("DROP TABLE IF EXISTS option;");
+        db.execSQL("DROP TABLE IF EXISTS user_quiz;");
         onCreate(db);
     }
 }

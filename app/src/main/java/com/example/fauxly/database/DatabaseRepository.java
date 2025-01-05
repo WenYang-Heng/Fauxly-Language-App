@@ -9,6 +9,9 @@ import com.example.fauxly.model.FlashCard;
 import com.example.fauxly.model.FlashCardItem;
 import com.example.fauxly.model.Lesson;
 import com.example.fauxly.model.LessonContent;
+import com.example.fauxly.model.Option;
+import com.example.fauxly.model.Quiz;
+import com.example.fauxly.model.QuizContent;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserLanguage;
 import com.example.fauxly.model.UserStats;
@@ -433,6 +436,137 @@ public class DatabaseRepository {
         db.delete("flashcard", "flashcard_id = ?", new String[]{String.valueOf(flashCardId)});
 
         android.util.Log.d("DatabaseRepository", "Flashcard deleted successfully with ID: " + flashCardId);
+    }
+
+    // In DatabaseRepository.java
+    public List<Quiz> getQuizzesWithCompletionStatus(int userId, String level, int languageId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Quiz> quizzes = new ArrayList<>();
+
+        String query = "SELECT q.quiz_id, q.quiz_title, q.language_id, q.level, " +
+                "CASE WHEN uq.isComplete = 1 THEN 1 ELSE 0 END AS isComplete " +
+                "FROM quiz q " +
+                "LEFT JOIN user_quiz uq ON q.quiz_id = uq.quiz_id AND uq.user_id = ? " +
+                "WHERE q.level = ? AND q.language_id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), level, String.valueOf(languageId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                String quizId = cursor.getString(cursor.getColumnIndexOrThrow("quiz_id"));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow("quiz_title")); // Updated to quiz_title
+                int langId = cursor.getInt(cursor.getColumnIndexOrThrow("language_id"));
+                String quizLevel = cursor.getString(cursor.getColumnIndexOrThrow("level"));
+                boolean isComplete = cursor.getInt(cursor.getColumnIndexOrThrow("isComplete")) == 1;
+
+                quizzes.add(new Quiz(quizId, title, langId, quizLevel, isComplete));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return quizzes;
+    }
+
+    public List<QuizContent> getQuizContents(String quizId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<QuizContent> contents = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM quiz_content WHERE quiz_id = ? ORDER BY sequence", new String[]{quizId});
+        while (cursor.moveToNext()) {
+            contents.add(new QuizContent(
+                    cursor.getInt(cursor.getColumnIndexOrThrow("content_id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("quiz_id")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("sequence")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("content_type")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("title"))
+            ));
+        }
+        cursor.close();
+        return contents;
+    }
+
+    public List<Option> getOptionsByContentId(int contentId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Option> options = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM option WHERE content_id = ?", new String[]{String.valueOf(contentId)});
+        while (cursor.moveToNext()) {
+            options.add(new Option(
+                    cursor.getInt(cursor.getColumnIndexOrThrow("option_id")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("content_id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("option_text")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_correct")) == 1
+            ));
+        }
+        cursor.close();
+        return options;
+    }
+
+    public boolean isCorrectOption(int optionId, int contentId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_correct FROM option WHERE option_id = ? AND content_id = ?",
+                new String[]{String.valueOf(optionId), String.valueOf(contentId)});
+
+        boolean isCorrect = false;
+        if (cursor.moveToFirst()) {
+            isCorrect = cursor.getInt(cursor.getColumnIndexOrThrow("is_correct")) == 1;
+        }
+        cursor.close();
+        return isCorrect;
+    }
+
+    // Check if the user has already attempted the quiz
+    public boolean isUserQuizExists(int userId, String quizId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM user_quiz WHERE user_id = ? AND quiz_id = ?",
+                new String[]{String.valueOf(userId), quizId}
+        );
+
+        boolean exists = cursor.moveToFirst(); // Check if the query returns any result
+        cursor.close();
+        return exists;
+    }
+
+    // Insert a new quiz entry for the user
+    public void insertUserQuiz(int userId, String quizId, int isComplete) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("user_id", userId);
+        values.put("quiz_id", quizId);
+        values.put("isComplete", isComplete);
+
+        long result = db.insert("user_quiz", null, values);
+
+        if (result != -1) {
+            android.util.Log.d("DatabaseRepository", "User quiz inserted successfully for user ID " + userId + " and quiz ID " + quizId);
+        } else {
+            android.util.Log.e("DatabaseRepository", "Failed to insert user quiz for user ID " + userId + " and quiz ID " + quizId);
+        }
+    }
+
+    public String getCorrectOptionText(int contentId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String correctAnswer = null;
+
+        String query = "SELECT option_text FROM option WHERE content_id = ? AND is_correct = 1";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(contentId)});
+
+        if (cursor.moveToFirst()) {
+            correctAnswer = cursor.getString(cursor.getColumnIndexOrThrow("option_text"));
+        }
+        cursor.close();
+        return correctAnswer;
+    }
+
+    public void updateUserQuizCompletion(int userId, String quizId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("isComplete", 1); // Set isComplete to true (1)
+
+        db.update("user_quiz", values, "user_id = ? AND quiz_id = ?", new String[]{String.valueOf(userId), quizId});
+        db.close();
     }
 
 

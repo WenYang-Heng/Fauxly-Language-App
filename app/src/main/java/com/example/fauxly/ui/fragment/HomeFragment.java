@@ -219,7 +219,6 @@ public class HomeFragment extends Fragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String currentDate = dateFormat.format(new Date());
 
-        // Add 200 XP
         int xpGained = 200;
         stats.setCurrentXp(stats.getCurrentXp() + xpGained);
         stats.setTotalXp(stats.getTotalXp() + xpGained); // Update total XP

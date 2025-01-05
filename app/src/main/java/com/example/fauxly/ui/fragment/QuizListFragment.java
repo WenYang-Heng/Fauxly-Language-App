@@ -9,20 +9,21 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
-import com.example.fauxly.model.Lesson;
-import com.example.fauxly.ui.adapter.LessonAdapter;
+import com.example.fauxly.model.Quiz;
+import com.example.fauxly.ui.adapter.QuizAdapter;
 import com.example.fauxly.utils.NavigationUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 
-public class LessonListFragment extends Fragment {
+public class QuizListFragment extends Fragment {
 
     private static final String ARG_USER_ID = "userId";
     private static final String ARG_LANGUAGE_ID = "languageId";
@@ -32,13 +33,13 @@ public class LessonListFragment extends Fragment {
     private int languageId;
     private String proficiencyLevel;
 
-    private RecyclerView lessonRecyclerView;
-    private LessonAdapter lessonAdapter;
+    private RecyclerView quizRecyclerView;
+    private QuizAdapter quizAdapter;
     private DatabaseRepository repository;
     private MaterialButton backButton;
 
-    public static LessonListFragment newInstance(String userId, int languageId, String proficiencyLevel) {
-        LessonListFragment fragment = new LessonListFragment();
+    public static QuizListFragment newInstance(String userId, int languageId, String proficiencyLevel) {
+        QuizListFragment fragment = new QuizListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_USER_ID, userId);
         args.putInt(ARG_LANGUAGE_ID, languageId);
@@ -62,16 +63,16 @@ public class LessonListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_lesson_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_quiz_list, container, false);
 
         // Initialize RecyclerView
-        lessonRecyclerView = view.findViewById(R.id.lessonRecyclerView);
-        lessonRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        quizRecyclerView = view.findViewById(R.id.quizRecyclerView);
+        quizRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Add divider decoration
         DividerItemDecoration itemDecorator = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.achievement_divider));
-        lessonRecyclerView.addItemDecoration(itemDecorator);
+        quizRecyclerView.addItemDecoration(itemDecorator);
 
         backButton = view.findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> {
@@ -79,34 +80,38 @@ public class LessonListFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
-        // Load lessons and populate RecyclerView
-        loadLessons();
+        // Load quizzes and populate RecyclerView
+        loadQuizzes();
 
         return view;
     }
 
-    private void loadLessons() {
-        // Fetch lessons with completion status
-        List<Lesson> lessons = repository.getLessonsWithCompletionStatus(
+    private void loadQuizzes() {
+        // Fetch quizzes with completion status
+        List<Quiz> quizzes = repository.getQuizzesWithCompletionStatus(
                 Integer.parseInt(userId), proficiencyLevel, languageId
         );
 
-        if (lessons != null && !lessons.isEmpty()) {
-            lessonAdapter = new LessonAdapter(lessons, lesson -> navigateToQuizFragment(lesson));
-            lessonRecyclerView.setAdapter(lessonAdapter);
+        if (quizzes != null && !quizzes.isEmpty()) {
+            quizAdapter = new QuizAdapter(quizzes, quiz -> navigateToQuizFragment(quiz));
+            quizRecyclerView.setAdapter(quizAdapter);
         } else {
-            System.out.println("No lessons found.");
+            System.out.println("No quizzes found.");
         }
     }
 
-    private void navigateToQuizFragment(Lesson lesson) {
+
+    private void navigateToQuizFragment(Quiz quiz) {
+        Log.d("QuizListFragment", "Navigating to QuizFragment with ID: " + quiz.getQuizId());
         NavigationUtil.navigateToQuizFragment(
                 requireActivity().getSupportFragmentManager(),
                 repository,
                 userId,
-                lesson.getLessonId(),
-                lesson.getLessonTitle(),
-                true // Indicates it's a lesson
+                quiz.getQuizId(),
+                quiz.getTitle(),
+                false // Indicates it's a quiz
         );
     }
+
+
 }

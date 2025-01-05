@@ -68,51 +68,55 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="16dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
-        <RadioButton
-            android:id="@+id/answerA"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Answer A"
-            style="@style/WhiteText"
-            android:button="@null"
-            android:background="@drawable/radio_button"
-            android:textColor="@color/radio_button_quiz"
-            android:layout_marginBottom="8dp"/>
+<!--        <RadioButton-->
+<!--            android:id="@+id/answerA"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingLeft="20dp"-->
+<!--            android:text="Answer A"-->
+<!--            style="@style/WhiteText"-->
+<!--            android:button="@null"-->
+<!--            android:background="@drawable/radio_button"-->
+<!--            android:textColor="@color/radio_button_quiz"-->
+<!--            android:layout_marginBottom="8dp"/>-->
 
-        <RadioButton
-            android:id="@+id/answerB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Answer B"
-            style="@style/WhiteText"
-            android:button="@null"
-            android:background="@drawable/radio_button"
-            android:textColor="@color/radio_button_quiz"
-            android:layout_marginBottom="8dp"/>
+<!--        <RadioButton-->
+<!--            android:id="@+id/answerB"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingLeft="20dp"-->
+<!--            android:text="Answer B"-->
+<!--            style="@style/WhiteText"-->
+<!--            android:button="@null"-->
+<!--            android:background="@drawable/radio_button"-->
+<!--            android:textColor="@color/radio_button_quiz"-->
+<!--            android:layout_marginBottom="8dp"/>-->
 
-        <RadioButton
-            android:id="@+id/answerC"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Answer C"
-            style="@style/WhiteText"
-            android:button="@null"
-            android:background="@drawable/radio_button"
-            android:textColor="@color/radio_button_quiz"
-            android:layout_marginBottom="8dp"/>
+<!--        <RadioButton-->
+<!--            android:id="@+id/answerC"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingLeft="20dp"-->
+<!--            android:text="Answer C"-->
+<!--            style="@style/WhiteText"-->
+<!--            android:button="@null"-->
+<!--            android:background="@drawable/radio_button"-->
+<!--            android:textColor="@color/radio_button_quiz"-->
+<!--            android:layout_marginBottom="8dp"/>-->
 
-        <RadioButton
-            android:id="@+id/answerD"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Answer D"
-            style="@style/WhiteText"
-            android:button="@null"
-            android:background="@drawable/radio_button"
-            android:textColor="@color/radio_button_quiz"
-            android:layout_marginBottom="8dp"/>
+<!--        <RadioButton-->
+<!--            android:id="@+id/answerD"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingLeft="20dp"-->
+<!--            android:text="Answer D"-->
+<!--            style="@style/WhiteText"-->
+<!--            android:button="@null"-->
+<!--            android:background="@drawable/radio_button"-->
+<!--            android:textColor="@color/radio_button_quiz"-->
+<!--            android:layout_marginBottom="8dp"/>-->
     </RadioGroup>
 
     <!--    Word Text View-->
@@ -126,7 +130,7 @@
         android:padding="16dp"
         android:textSize="30sp"
         android:textColor="@color/white"
-        android:background="@drawable/rounded_corners"/>
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/pronunciationTextView"
@@ -138,7 +142,7 @@
         android:padding="16dp"
         android:textSize="30sp"
         android:textColor="@color/white"
-        android:background="@drawable/rounded_corners"/>
+        android:visibility="gone"/>
 
     <!--  Audio Button  -->
     <Button
@@ -149,7 +153,8 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView"
+        android:visibility="gone"/>
 
 
     <TextView
@@ -162,13 +167,25 @@
         android:padding="16dp"
         android:layout_marginTop="24dp"
         android:textSize="24sp"
-        android:background="@drawable/rounded_corners"/>
+        android:background="@drawable/rounded_corners"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/confirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Confirm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/quiz_confirm_button"
+        app:backgroundTint="#00BFA6"/>
+
+    <Button
+        android:id="@+id/nextQuiz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
