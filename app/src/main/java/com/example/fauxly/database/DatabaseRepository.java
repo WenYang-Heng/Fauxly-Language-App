@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.fauxly.model.Achievement;
 import com.example.fauxly.model.FlashCard;
 import com.example.fauxly.model.FlashCardItem;
 import com.example.fauxly.model.Lesson;
@@ -584,7 +585,36 @@ public class DatabaseRepository {
         return count;
     }
 
+    public List<Achievement> getAllAchievementsWithUserStatus(String userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Achievement> achievements = new ArrayList<>();
 
+        String query = "SELECT a.achievement_id, a.title, a.description, " +
+                "CASE WHEN ua.date_achieved IS NOT NULL THEN 1 ELSE 0 END AS isAchieved, " +
+                "ua.date_achieved " +
+                "FROM achievement a " +
+                "LEFT JOIN user_achievement ua " +
+                "ON a.achievement_id = ua.achievement_id AND ua.user_id = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{userId})) {
+            if (cursor.moveToFirst()) {
+                do {
+                    int achievementId = cursor.getInt(cursor.getColumnIndexOrThrow("achievement_id"));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                    boolean isAchieved = cursor.getInt(cursor.getColumnIndexOrThrow("isAchieved")) == 1;
+                    String dateAchieved = cursor.getString(cursor.getColumnIndexOrThrow("date_achieved"));
+
+                    Achievement achievement = new Achievement(achievementId, title, description, isAchieved, dateAchieved);
+                    achievements.add(achievement);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            db.close();
+        }
+
+        return achievements;
+    }
 
     public void resetUserStreak(int userId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

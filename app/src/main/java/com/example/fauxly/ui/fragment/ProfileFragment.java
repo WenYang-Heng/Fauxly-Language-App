@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class ProfileFragment extends Fragment {
     private UserStats userStats;
 
     private TextView userNameTextView, userLevelTextView, progressTextView, quizCompletedTextView, lessonCompletedTextView, wordsLearnedTextView, xpEarnedTextView;
+    private Button achievementButton;
     private ProgressBar levelProgressBar;
 
     public ProfileFragment() {
@@ -61,11 +63,24 @@ public class ProfileFragment extends Fragment {
         lessonCompletedTextView = view.findViewById(R.id.lessonCompleted);
         wordsLearnedTextView = view.findViewById(R.id.wordsLearned);
         xpEarnedTextView = view.findViewById(R.id.xpEarned);
+        achievementButton = view.findViewById(R.id.achievementButton);
+
+        achievementButton.setOnClickListener(v -> navigateToAchievementFragment());
 
         // Fetch and display user info
         fetchAndDisplayUserInfo();
 
         return view;
+    }
+
+    private void navigateToAchievementFragment() {
+        AchievementFragment achievementFragment = AchievementFragment.newInstance(userId);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container_view, achievementFragment)
+                .addToBackStack("ProfileFragment")
+                .commit();
     }
 
     private void fetchAndDisplayUserInfo() {

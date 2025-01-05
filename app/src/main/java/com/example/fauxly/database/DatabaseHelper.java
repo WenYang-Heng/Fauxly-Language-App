@@ -82,9 +82,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE user_achievement (" +
                 "user_id INTEGER, " +
                 "achievement_id INTEGER, " +
-                "date_achieved DATE, " +
+                "date_achieved TEXT, " +
+                "is_achieved INTEGER DEFAULT 0, " +
                 "FOREIGN KEY(user_id) REFERENCES user(user_id), " +
-                "FOREIGN KEY(achievement_id) REFERENCES achievement(achievement_id)" +
+                "FOREIGN KEY(achievement_id) REFERENCES achievement(achievement_id)," +
+                "PRIMARY KEY(user_id, achievement_id)" +
                 ");");
 
         // lesson table
@@ -167,6 +169,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultQuiz(db);
         insertDefaultQuizContent(db);
         insertDefaultQuizOption(db);
+        insertDefaultAchievementData(db);
     }
 
     private void insertDefaultFlashCards(SQLiteDatabase db) {
@@ -295,8 +298,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void insertDefaultAchievementData(SQLiteDatabase db) {
+        // Insert default achievements
+        db.execSQL("INSERT INTO achievement (title, description) VALUES " +
+                "('First Lesson', 'Complete your first lesson'), " +
+                "('Quiz Master', 'Complete your first quiz'), " +
+                "('Daily Devotee', 'Claim your first daily login reward'), " +
+                "('Level Up!', 'Reach Level 2'), " +
+                "('Steady Learner', 'Complete 5 lessons');");
 
+        android.util.Log.d("DatabaseHelper", "Default achievements inserted.");
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
