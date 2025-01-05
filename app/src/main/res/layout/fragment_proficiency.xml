@@ -78,6 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Intermediate"
+            android:singleLine="false"
             style="@style/WhiteText"
             android:button="@null"
             android:background="@drawable/radio_button_language_selection"
@@ -89,7 +90,8 @@
             android:drawablePadding="20dp"
             android:layout_marginLeft="10dp"
             android:gravity="center"
-            android:drawableTop="@drawable/intermediate_icon_wrapper"/>
+            android:drawableTop="@drawable/intermediate_icon_wrapper"
+            android:enabled="false"/>
 
         <RadioButton
             android:id="@+id/advanced"
@@ -107,7 +109,8 @@
             android:drawablePadding="20dp"
             android:layout_marginLeft="10dp"
             android:text="Advanced"
-            android:textColor="@color/radio_button_quiz" />
+            android:textColor="@color/radio_button_quiz"
+            android:enabled="false"/>
     </RadioGroup>
 
     <!-- Continue Button -->

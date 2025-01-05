@@ -569,6 +569,22 @@ public class DatabaseRepository {
         db.close();
     }
 
+    public int getCompletedQuizzesCount(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM user_quiz WHERE user_id = ? AND isComplete = 1";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+
+        return count;
+    }
+
+
 
     public void resetUserStreak(int userId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

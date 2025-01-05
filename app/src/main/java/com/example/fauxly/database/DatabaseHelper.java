@@ -267,7 +267,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Insert default quizzes for Japanese (language_id = 1)
         db.execSQL("INSERT INTO quiz (quiz_id, language_id, level, quiz_title) VALUES " +
                 "('BQ1', 1, 'B', 'Japanese Beginner Quiz 1'), " +
-                "('BQ2', 1, 'B', 'Japanese Beginner Quiz 2'), " +
                 "('IQ1', 1, 'I', 'Japanese Intermediate Quiz 1'), " +
                 "('AQ1', 1, 'A', 'Japanese Advanced Quiz 1');");
     }

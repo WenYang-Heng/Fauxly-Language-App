@@ -87,12 +87,15 @@ public class ProfileFragment extends Fragment {
                 int completedLessons = repository.getCompletedLessonsCount(Integer.parseInt(userId));
                 lessonCompletedTextView.setText(String.valueOf(completedLessons));
 
+                // Fetch completed quizzes count
+                int completedQuizzes = repository.getCompletedQuizzesCount(Integer.parseInt(userId));
+                quizCompletedTextView.setText(String.valueOf(completedQuizzes));
+
                 wordsLearnedTextView.setText(String.valueOf(userStats.getWordsLearned()));
                 xpEarnedTextView.setText(String.valueOf(userStats.getTotalXp()));
-
-                quizCompletedTextView.setText("15");
             }
         }
     }
+
 
 }

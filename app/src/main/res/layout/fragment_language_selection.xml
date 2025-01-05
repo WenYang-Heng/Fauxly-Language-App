@@ -76,7 +76,7 @@
             android:tag="2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Korean"
+            android:text="Korean (Unavailable)"
             style="@style/WhiteText"
             android:button="@null"
             android:background="@drawable/radio_button_language_selection"
@@ -84,7 +84,8 @@
             android:padding="16dp"
             android:gravity="center"
             android:layout_marginBottom="8dp"
-            android:drawableLeft="@drawable/korea_icon_wrapper"/>
+            android:drawableLeft="@drawable/korea_icon_wrapper"
+            android:enabled="false"/>
     </RadioGroup>
 
     <!-- Continue Button -->
