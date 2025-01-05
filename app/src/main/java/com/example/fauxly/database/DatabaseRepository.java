@@ -143,6 +143,22 @@ public class DatabaseRepository {
         return lessons;
     }
 
+    public int getCompletedLessonsCount(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int count = 0;
+
+        String query = "SELECT COUNT(*) FROM user_lesson WHERE user_id = ? AND isComplete = 1";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+        db.close();
+
+        return count;
+    }
 
 
     public List<LessonContent> getLessonContents(String lessonId) {

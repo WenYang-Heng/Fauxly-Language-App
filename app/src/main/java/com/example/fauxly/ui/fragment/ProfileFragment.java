@@ -83,12 +83,16 @@ public class ProfileFragment extends Fragment {
                 levelProgressBar.setMax(userStats.getLevelUpXp());
                 levelProgressBar.setProgress(userStats.getCurrentXp());
 
-                // Placeholder data for statistics
-                quizCompletedTextView.setText("15");
-                lessonCompletedTextView.setText("10");
+                // Fetch completed lessons count
+                int completedLessons = repository.getCompletedLessonsCount(Integer.parseInt(userId));
+                lessonCompletedTextView.setText(String.valueOf(completedLessons));
+
                 wordsLearnedTextView.setText(String.valueOf(userStats.getWordsLearned()));
                 xpEarnedTextView.setText(String.valueOf(userStats.getTotalXp()));
+
+                quizCompletedTextView.setText("15");
             }
         }
     }
+
 }
