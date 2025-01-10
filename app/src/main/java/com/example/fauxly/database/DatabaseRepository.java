@@ -58,6 +58,24 @@ public class DatabaseRepository {
         }
     }
 
+    public String getUserIdByEmailAndPassword(String email, String password) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT user_id FROM user WHERE email = ? AND password = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email, password});
+
+        String userId = null;
+        if (cursor.moveToFirst()) {
+            userId = cursor.getString(0); // Fetch the user ID
+        }
+
+        cursor.close();
+        db.close();
+
+        return userId; // Returns null if no match is found
+    }
+
+
     public void insertUserLanguage(int userId, int languageId, String proficiencyLevel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

@@ -7,7 +7,4 @@
   <item
       android:id="@+id/profileFragment"
       android:title="Profile"/>
-  <item
-      android:id="@+id/quizFragment"
-      android:title="Quiz"/>
 </menu>

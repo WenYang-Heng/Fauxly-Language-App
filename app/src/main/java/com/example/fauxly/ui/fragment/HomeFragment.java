@@ -13,20 +13,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fauxly.MainActivity;
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
+import com.example.fauxly.utils.FragmentUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
-
+    private static final String ARG_USER_ID = "userId";
     private LinearLayout day1, day2, day3, day4, day5;
     private DatabaseRepository repository;
-    private String userId = "100";
+    private String userId;
     private UserStats stats;
     private User user;
     private TextView TVUsername;
@@ -52,8 +54,21 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            userId = getArguments().getString(ARG_USER_ID);
+        } else {
+            userId = ((MainActivity) requireActivity()).getUserId();
+        }
+        repository = new DatabaseRepository(requireContext());
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        FragmentUtils.setFragmentContainerMarginBottom(requireActivity(), false);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Initialize the LinearLayouts

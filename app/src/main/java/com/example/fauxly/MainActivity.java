@@ -1,5 +1,6 @@
 package com.example.fauxly;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnUserIdChangeListener {
     BottomNavigationView bottomNavigationView;
-    private String userId = "100";
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnUs
 
         cursor.close();
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNav);
+        bottomNavigationView = findViewById(R.id.bottomNav);
 
         // Retrieve the NavHostFragment and NavController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container_view);
@@ -66,25 +67,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnUs
             // Dynamically handle navigation item selection
             bottomNavigationView.setOnItemSelectedListener(item -> {
                 int itemId = item.getItemId();
-
                 if (itemId == R.id.homeFragment) {
-                    navController.navigate(R.id.homeFragment);
+                    if (userId != null) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("userId", userId);
+                        navController.navigate(R.id.homeFragment, bundle);
+                    }
                     return true;
-
                 } else if (itemId == R.id.profileFragment) {
-                    // Dynamically pass userId to ProfileFragment
-                    Bundle bundle = new Bundle();
-                    bundle.putString("userId", userId); // Pass updated userId dynamically
-                    navController.navigate(R.id.profileFragment, bundle);
-                    return true;
-
-                } else if (itemId == R.id.quizFragment) {
-                    navController.navigate(R.id.quizFragment);
+                    if (userId != null) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("userId", userId);
+                        navController.navigate(R.id.profileFragment, bundle);
+                    }
                     return true;
                 }
-
                 return false;
             });
+
         } else {
             Log.e("MainActivity", "NavHostFragment is null. Navigation setup failed.");
         }
@@ -95,6 +95,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnUs
     public void onUserIdChanged(String newUserId) {
         this.userId = newUserId;
         Log.d("MainActivity", "User ID updated: " + newUserId);
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }
 
