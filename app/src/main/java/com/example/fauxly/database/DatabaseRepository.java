@@ -43,19 +43,43 @@ public class DatabaseRepository {
     }
 
     // Insert into user table
-    public void insertUser(String name, String email, String password) {
+    public long insertUser(String name, String email, String password) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("name", name);
-        values.put("email", email);
-        values.put("password", password);
+        long userId = -1;
 
-        long newRowId = db.insert("user", null, values);
-        if (newRowId != -1) {
-            android.util.Log.d("DatabaseRepository", "User inserted successfully with ID: " + newRowId);
-        } else {
-            android.util.Log.e("DatabaseRepository", "Error inserting user.");
+        db.beginTransaction();
+        try {
+            ContentValues userValues = new ContentValues();
+            userValues.put("name", name);
+            userValues.put("email", email);
+            userValues.put("password", password);
+            userId = db.insert("user", null, userValues);
+
+            if (userId > 0) {
+                // Insert default user stats for the new user
+                ContentValues statsValues = new ContentValues();
+                statsValues.put("user_id", userId);
+                statsValues.put("current_level", 1);
+                statsValues.put("total_xp", 0);
+                statsValues.put("current_xp", 0);
+                statsValues.put("level_up_xp", 1000);
+                statsValues.put("words_learned", 0);
+                statsValues.put("total_login_streak", 0);
+                statsValues.put("five_day_login_streak", 0);
+                statsValues.put("last_claim_date", (String) null);
+
+                db.insert("user_stats", null, statsValues);
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+            userId = -1; // Reset userId if any error occurs
+        } finally {
+            db.endTransaction();
         }
+
+        return userId;
     }
 
     public String getUserIdByEmailAndPassword(String email, String password) {
@@ -75,6 +99,13 @@ public class DatabaseRepository {
         return userId; // Returns null if no match is found
     }
 
+    public boolean isEmailExists(String email) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM user WHERE email = ?", new String[]{email});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
 
     public void insertUserLanguage(int userId, int languageId, String proficiencyLevel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

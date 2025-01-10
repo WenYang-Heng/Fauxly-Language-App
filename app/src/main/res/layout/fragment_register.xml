@@ -59,6 +59,7 @@
             android:layout_marginBottom="20dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded"
@@ -79,6 +80,7 @@
             android:textColorHint="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded"
@@ -100,6 +102,7 @@
             android:textColorHint="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded"
@@ -121,6 +124,7 @@
             android:textColorHint="@android:color/darker_gray">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/confirmPasswordInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded"
@@ -136,7 +140,7 @@
 <!--            android:text="I understood the terms policy." />-->
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/signUpButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="#00BFA6"
