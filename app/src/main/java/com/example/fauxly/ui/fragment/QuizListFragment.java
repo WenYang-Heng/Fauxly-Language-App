@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
@@ -37,6 +38,7 @@ public class QuizListFragment extends Fragment {
     private QuizAdapter quizAdapter;
     private DatabaseRepository repository;
     private MaterialButton backButton;
+    private TextView errorTextView;
 
     public static QuizListFragment newInstance(String userId, int languageId, String proficiencyLevel) {
         QuizListFragment fragment = new QuizListFragment();
@@ -69,6 +71,8 @@ public class QuizListFragment extends Fragment {
         quizRecyclerView = view.findViewById(R.id.quizRecyclerView);
         quizRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        errorTextView = view.findViewById(R.id.errorTextView);
+
         // Add divider decoration
         DividerItemDecoration itemDecorator = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.achievement_divider));
@@ -80,8 +84,12 @@ public class QuizListFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
-        // Load quizzes and populate RecyclerView
-        loadQuizzes();
+        if (languageId == -1) {
+            displayError("Please select a language to view quizzes.");
+        } else {
+            errorTextView.setVisibility(View.GONE);
+            loadQuizzes();
+        }
 
         return view;
     }
@@ -113,5 +121,9 @@ public class QuizListFragment extends Fragment {
         );
     }
 
-
+    private void displayError(String message) {
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(message);
+        quizRecyclerView.setVisibility(View.GONE); // Hide RecyclerView
+    }
 }

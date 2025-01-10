@@ -43,4 +43,18 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
+    <!-- Error TextView -->
+    <TextView
+        android:id="@+id/errorTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:text="Ooops something went wrong"
+        android:visibility="visible"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backButton" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

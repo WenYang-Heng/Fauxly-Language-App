@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
@@ -36,6 +37,7 @@ public class LessonListFragment extends Fragment {
     private LessonAdapter lessonAdapter;
     private DatabaseRepository repository;
     private MaterialButton backButton;
+    private TextView errorTextView;
 
     public static LessonListFragment newInstance(String userId, int languageId, String proficiencyLevel) {
         LessonListFragment fragment = new LessonListFragment();
@@ -68,6 +70,8 @@ public class LessonListFragment extends Fragment {
         lessonRecyclerView = view.findViewById(R.id.lessonRecyclerView);
         lessonRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        errorTextView = view.findViewById(R.id.errorTextView);
+
         // Add divider decoration
         DividerItemDecoration itemDecorator = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.achievement_divider));
@@ -79,8 +83,12 @@ public class LessonListFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
-        // Load lessons and populate RecyclerView
-        loadLessons();
+        if (languageId == -1) {
+            displayError("Please select a language to view lessons.");
+        } else {
+            errorTextView.setVisibility(View.GONE);
+            loadLessons();
+        }
 
         return view;
     }
@@ -108,5 +116,11 @@ public class LessonListFragment extends Fragment {
                 lesson.getLessonTitle(),
                 true // Indicates it's a lesson
         );
+    }
+
+    private void displayError(String message) {
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(message);
+        lessonRecyclerView.setVisibility(View.GONE); // Hide RecyclerView
     }
 }

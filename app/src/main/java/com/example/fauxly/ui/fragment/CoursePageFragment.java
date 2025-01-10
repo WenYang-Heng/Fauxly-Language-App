@@ -85,35 +85,27 @@ public class CoursePageFragment extends Fragment {
     }
 
     private void navigateToLessonList() {
-        if (userId != null && userLanguage != null) {
-            // Pass userId, languageId, and proficiencyLevel to LessonListFragment
-            Fragment lessonListFragment = LessonListFragment.newInstance(
-                    userId,
-                    userLanguage.getLanguageId(),
-                    userLanguage.getProficiencyLevel()
-            );
+        Fragment lessonListFragment = LessonListFragment.newInstance(
+                userId,
+                userLanguage != null ? userLanguage.getLanguageId() : -1,
+                userLanguage != null ? userLanguage.getProficiencyLevel() : null
+        );
 
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container_view, lessonListFragment) // Replace with your container ID
-                    .addToBackStack(null)
-                    .commit();
-        }
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container_view, lessonListFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void navigateToFlashCardList() {
-        if (userId != null && userLanguage != null) {
-            // Pass userId and languageId to FlashCardFragment
-            Fragment flashCardFragment = FlashCardFragment.newInstance(
-                    userId
-            );
+        Fragment flashCardFragment = FlashCardFragment.newInstance(userId);
 
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container_view, flashCardFragment) // Replace with your container ID
-                    .addToBackStack(null)
-                    .commit();
-        }
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container_view, flashCardFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void navigateToLanguageSelection() {
@@ -130,19 +122,17 @@ public class CoursePageFragment extends Fragment {
     }
 
     private void navigateToQuizList() {
-        if (userId != null && userLanguage != null) {
-            Fragment quizListFragment = QuizListFragment.newInstance(
-                    userId,
-                    userLanguage.getLanguageId(),
-                    userLanguage.getProficiencyLevel()
-            );
+        Fragment quizListFragment = QuizListFragment.newInstance(
+                userId,
+                userLanguage != null ? userLanguage.getLanguageId() : -1,
+                userLanguage != null ? userLanguage.getProficiencyLevel() : null
+        );
 
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container_view, quizListFragment)
-                    .addToBackStack(null)
-                    .commit();
-        }
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container_view, quizListFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void loadUserData() {
@@ -173,14 +163,14 @@ public class CoursePageFragment extends Fragment {
                         proficiencyLabel = "Advanced";
                         break;
                     default:
-                        proficiencyLabel = "Unknown";
+                        proficiencyLabel = "";
                         break;
                 }
 
                 TVLevel.setText(proficiencyLabel);
             } else {
                 TVLanguage.setText("Not Assigned");
-                TVLevel.setText("N/A");
+                TVLevel.setText("");
             }
         }
     }
