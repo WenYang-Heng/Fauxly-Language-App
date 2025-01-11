@@ -18,6 +18,7 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
+import com.example.fauxly.utils.AchievementTracker;
 import com.example.fauxly.utils.FragmentUtils;
 
 import java.text.SimpleDateFormat;
@@ -257,6 +258,9 @@ public class HomeFragment extends Fragment {
 
         // Update the database to mark the day as claimed
         repository.updateUserStreakAndDate(Integer.parseInt(userId), dayNumber, currentDate);
+
+        AchievementTracker tracker = new AchievementTracker(requireContext());
+        tracker.evaluateAchievements(Integer.parseInt(userId));
 
         // Fetch updated user stats to refresh the UI
         fetchUserStats();

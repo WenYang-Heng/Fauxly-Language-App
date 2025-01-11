@@ -12,9 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.model.UserStats;
+import com.example.fauxly.utils.AchievementTracker;
 
 public class QuizCompletedFragment extends Fragment {
 
@@ -73,6 +76,7 @@ public class QuizCompletedFragment extends Fragment {
         doneButton = view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(v -> {
             updateCompletionStatus();
+            trackAchievements();
             navigateBackToCorrectList();
         });
 
@@ -83,10 +87,43 @@ public class QuizCompletedFragment extends Fragment {
         if (id != null && userId != null) {
             if (isLesson) {
                 repository.updateUserLessonCompletion(Integer.parseInt(userId), id);
+
+                if ("BL1".equals(id)) {
+                    int userIdInt = Integer.parseInt(userId);
+                    UserStats stats = repository.getUserStatsById(userIdInt);
+                    if (stats != null) {
+                        // Add 1000 XP for completing the first lesson
+                        stats.setCurrentXp(stats.getCurrentXp() + 1000);
+                        stats.setTotalXp(stats.getTotalXp() + 1000);
+
+                        // Check if user needs to level up
+                        while (stats.getCurrentXp() >= stats.getLevelUpXp()) {
+                            stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp()); // Carry over remaining XP
+                            stats.setCurrentLevel(stats.getCurrentLevel() + 1); // Increment the level
+
+                            Toast.makeText(requireContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel() + "!", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // Update user stats in the database
+                        repository.updateUserStatsXpAndLevel(
+                                userIdInt,
+                                stats.getCurrentXp(),
+                                stats.getCurrentLevel(),
+                                stats.getTotalXp()
+                        );
+                    }
+                }
             } else {
                 repository.updateUserQuizCompletion(Integer.parseInt(userId), id);
             }
         }
+    }
+
+
+    private void trackAchievements() {
+        AchievementTracker tracker = new AchievementTracker(requireContext());
+        int userIdInt = Integer.parseInt(userId);
+        tracker.evaluateAchievements(userIdInt);
     }
 
     private void navigateBackToCorrectList() {

@@ -838,5 +838,70 @@ public class DatabaseRepository {
         return count;
     }
 
+    public boolean isAchievementUnlocked(int userId, int achievementId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT is_achieved FROM user_achievement WHERE user_id = ? AND achievement_id = ?",
+                new String[]{String.valueOf(userId), String.valueOf(achievementId)}
+        );
+
+        boolean isUnlocked = false;
+        if (cursor.moveToFirst()) {
+            isUnlocked = cursor.getInt(cursor.getColumnIndexOrThrow("is_achieved")) == 1;
+        }
+        cursor.close();
+        db.close();
+        return isUnlocked;
+    }
+
+
+    public void unlockAchievement(int userId, int achievementId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Check if the achievement is already unlocked
+        Cursor cursor = db.rawQuery(
+                "SELECT is_achieved FROM user_achievement WHERE user_id = ? AND achievement_id = ?",
+                new String[]{String.valueOf(userId), String.valueOf(achievementId)}
+        );
+
+        if (cursor.moveToFirst()) {
+            int isAchieved = cursor.getInt(cursor.getColumnIndexOrThrow("is_achieved"));
+            if (isAchieved == 1) {
+                cursor.close();
+                db.close();
+                return; // Achievement is already unlocked
+            }
+        }
+        cursor.close();
+
+        // Unlock the achievement
+        ContentValues values = new ContentValues();
+        values.put("user_id", userId);
+        values.put("achievement_id", achievementId);
+        values.put("date_achieved", getCurrentDate());
+        values.put("is_achieved", 1);
+
+        // Insert or update the record
+        db.insertWithOnConflict("user_achievement", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+        db.close();
+    }
+
+    public String getAchievementTitle(int achievementId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT title FROM achievement WHERE achievement_id = ?",
+                new String[]{String.valueOf(achievementId)}
+        );
+
+        String title = null;
+        if (cursor.moveToFirst()) {
+            title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+        }
+        cursor.close();
+        db.close();
+        return title;
+    }
+
 
 }
