@@ -70,6 +70,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "UNIQUE(user_id, language_id) ON CONFLICT REPLACE" + // Prevent duplicates, replace if duplicate
                 ");");
 
+        // word bank table
+        db.execSQL("CREATE TABLE word_bank (" +
+                "word_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "word TEXT NOT NULL, " +
+                "pronunciation TEXT, " +
+                "translation TEXT, " +
+                "proficiency_level TEXT CHECK (proficiency_level IN ('B', 'I', 'A')), " +
+                "audio_path TEXT, " +
+                "language_id INTEGER, " +
+                "FOREIGN KEY(language_id) REFERENCES language(language_id)" +
+                ");");
+
+        // user word table
+        db.execSQL("CREATE TABLE user_word (" +
+                "user_id INTEGER, " +
+                "word_id INTEGER, " +
+                "is_learned INTEGER DEFAULT 0, " +
+                "date_learned DATE, " +
+                "FOREIGN KEY(user_id) REFERENCES user(user_id), " +
+                "FOREIGN KEY(word_id) REFERENCES word_bank(word_id), " +
+                "PRIMARY KEY(user_id, word_id)" +
+                ");");
 
         // achievement table
         db.execSQL("CREATE TABLE achievement (" +
@@ -170,6 +192,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultQuizContent(db);
         insertDefaultQuizOption(db);
         insertDefaultAchievementData(db);
+        insertDefaultWordBank(db);
     }
 
     private void insertDefaultFlashCards(SQLiteDatabase db) {
@@ -200,7 +223,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         android.util.Log.d("DatabaseHelper", "Default test user and stats inserted.");
     }
-
 
     private void insertDefaultLanguages(SQLiteDatabase db) {
         db.execSQL("INSERT INTO language (name) VALUES ('Japanese');");
@@ -307,6 +329,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "('Steady Learner', 'Complete 5 lessons');");
 
         android.util.Log.d("DatabaseHelper", "Default achievements inserted.");
+    }
+
+    private void insertDefaultWordBank(SQLiteDatabase db) {
+        // japanese beginner
+        db.execSQL("INSERT INTO word_bank (word, pronunciation, translation, proficiency_level, audio_path, language_id) VALUES " +
+                "('猫', 'neko', 'Cat', 'B', 'jp_cat.mp3', 1), " +
+                "('犬', 'inu', 'Dog', 'B', 'jp_dog.mp3', 1), " +
+                "('本', 'hon', 'Book', 'B', 'jp_book.mp3', 1), " +
+                "('水', 'mizu', 'Water', 'B', 'jp_water.mp3', 1), " +
+                "('家', 'ie', 'House', 'B', 'jp_house.mp3', 1), " +
+                "('車', 'kuruma', 'Car', 'B', 'jp_car.mp3', 1), " +
+                "('駅', 'eki', 'Train Station', 'B', 'jp_train_station.mp3', 1), " +
+                "('友達', 'tomodachi', 'Friend', 'B', 'jp_friend.mp3', 1), " +
+                "('学校', 'gakkou', 'School', 'B', 'jp_school.mp3', 1), " +
+                "('先生', 'sensei', 'Teacher', 'B', 'jp_teacher.mp3', 1);");
+
+        android.util.Log.d("DatabaseHelper", "Default Japanese words inserted.");
     }
 
 
