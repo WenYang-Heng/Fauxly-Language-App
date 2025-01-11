@@ -9,7 +9,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.fauxly.MainActivity;
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
@@ -25,8 +28,15 @@ public class ProfileFragment extends Fragment {
     private User user;
     private UserStats userStats;
 
-    private TextView userNameTextView, userLevelTextView, progressTextView, quizCompletedTextView, lessonCompletedTextView, wordsLearnedTextView, xpEarnedTextView;
+    private TextView userNameTextView,
+            userLevelTextView,
+            progressTextView,
+            quizCompletedTextView,
+            lessonCompletedTextView,
+            wordsLearnedTextView,
+            xpEarnedTextView;
     private Button achievementButton;
+    private Button logoutButton;
     private ProgressBar levelProgressBar;
 
     public ProfileFragment() {
@@ -66,13 +76,25 @@ public class ProfileFragment extends Fragment {
         wordsLearnedTextView = view.findViewById(R.id.wordsLearned);
         xpEarnedTextView = view.findViewById(R.id.xpEarned);
         achievementButton = view.findViewById(R.id.achievementButton);
+        logoutButton = view.findViewById(R.id.logoutButton);
 
         achievementButton.setOnClickListener(v -> navigateToAchievementFragment());
+        logoutButton.setOnClickListener(v -> logout());
 
         // Fetch and display user info
         fetchAndDisplayUserInfo();
 
         return view;
+    }
+
+    private void logout() {
+        // Navigate back to LoginFragment
+        NavController navController = NavHostFragment.findNavController(this);
+
+        // Reset userId in MainActivity
+        ((MainActivity) requireActivity()).setUserId(null);
+
+        navController.navigate(R.id.action_profileFragment_to_loginFragment);
     }
 
     private void navigateToAchievementFragment() {

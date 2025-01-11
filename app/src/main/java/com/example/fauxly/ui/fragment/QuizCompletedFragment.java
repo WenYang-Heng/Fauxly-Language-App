@@ -85,36 +85,46 @@ public class QuizCompletedFragment extends Fragment {
 
     private void updateCompletionStatus() {
         if (id != null && userId != null) {
-            if (isLesson) {
-                repository.updateUserLessonCompletion(Integer.parseInt(userId), id);
+            int userIdInt = Integer.parseInt(userId);
 
-                if ("BL1".equals(id)) {
-                    int userIdInt = Integer.parseInt(userId);
-                    UserStats stats = repository.getUserStatsById(userIdInt);
-                    if (stats != null) {
-                        // Add 1000 XP for completing the first lesson
-                        stats.setCurrentXp(stats.getCurrentXp() + 1000);
-                        stats.setTotalXp(stats.getTotalXp() + 1000);
+            boolean isCompleted = isLesson
+                    ? repository.isLessonCompleted(userIdInt, id) // Check if lesson is completed
+                    : repository.isQuizCompleted(userIdInt, id); // Check if quiz is completed
 
-                        // Check if user needs to level up
-                        while (stats.getCurrentXp() >= stats.getLevelUpXp()) {
-                            stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp()); // Carry over remaining XP
-                            stats.setCurrentLevel(stats.getCurrentLevel() + 1); // Increment the level
-
-                            Toast.makeText(requireContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel() + "!", Toast.LENGTH_SHORT).show();
-                        }
-
-                        // Update user stats in the database
-                        repository.updateUserStatsXpAndLevel(
-                                userIdInt,
-                                stats.getCurrentXp(),
-                                stats.getCurrentLevel(),
-                                stats.getTotalXp()
-                        );
-                    }
+            if (!isCompleted) {
+                if (isLesson) {
+                    // Mark lesson as complete
+                    repository.updateUserLessonCompletion(userIdInt, id);
+                } else {
+                    // Mark quiz as complete
+                    repository.updateUserQuizCompletion(userIdInt, id);
                 }
-            } else {
-                repository.updateUserQuizCompletion(Integer.parseInt(userId), id);
+
+                // Fetch current stats
+                UserStats stats = repository.getUserStatsById(userIdInt);
+                if (stats != null) {
+                    // Grant 500 XP
+                    stats.setCurrentXp(stats.getCurrentXp() + 500);
+                    stats.setTotalXp(stats.getTotalXp() + 500);
+
+                    Toast.makeText(requireContext(), "You earned " + 500 + " XP!", Toast.LENGTH_SHORT).show();
+
+                    // Check for level-up
+                    while (stats.getCurrentXp() >= stats.getLevelUpXp()) {
+                        stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp()); // Carry over remaining XP
+                        stats.setCurrentLevel(stats.getCurrentLevel() + 1); // Increment the level
+
+                        Toast.makeText(requireContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel() + "!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Update the stats in the database
+                    repository.updateUserStatsXpAndLevel(
+                            userIdInt,
+                            stats.getCurrentXp(),
+                            stats.getCurrentLevel(),
+                            stats.getTotalXp()
+                    );
+                }
             }
         }
     }

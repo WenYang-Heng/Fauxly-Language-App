@@ -302,6 +302,35 @@ public class DatabaseRepository {
         db.close();
     }
 
+    public boolean isLessonCompleted(int userId, String lessonId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT isComplete FROM user_lesson WHERE user_id = ? AND lesson_id = ?",
+                new String[]{String.valueOf(userId), lessonId});
+
+        boolean isCompleted = false;
+        if (cursor.moveToFirst()) {
+            isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow("isComplete")) == 1;
+        }
+        cursor.close();
+        return isCompleted;
+    }
+
+    public boolean isQuizCompleted(int userId, String quizId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT isComplete FROM user_quiz WHERE user_id = ? AND quiz_id = ?",
+                new String[]{String.valueOf(userId), quizId});
+
+        boolean isCompleted = false;
+        if (cursor.moveToFirst()) {
+            isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow("isComplete")) == 1;
+        }
+        cursor.close();
+        return isCompleted;
+    }
+
+
 
 
     // Get User by ID
