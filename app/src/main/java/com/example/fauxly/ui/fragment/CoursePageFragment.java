@@ -17,6 +17,7 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserLanguage;
+import com.example.fauxly.utils.FragmentUtils;
 import com.google.android.material.button.MaterialButton;
 
 public class CoursePageFragment extends Fragment {
@@ -51,6 +52,7 @@ public class CoursePageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_course_page, container, false);
 
+        FragmentUtils.setFragmentContainerMarginBottom(requireActivity(), true);
         // Initialize UI elements
         backButton = view.findViewById(R.id.backButton);
         changeLanguageButton = view.findViewById(R.id.changeLanguageButton);

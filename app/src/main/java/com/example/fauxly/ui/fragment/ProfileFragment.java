@@ -14,6 +14,7 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
+import com.example.fauxly.utils.FragmentUtils;
 
 public class ProfileFragment extends Fragment {
 
@@ -54,6 +55,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        FragmentUtils.setFragmentContainerMarginBottom(requireActivity(), false);
         // Initialize views
         userNameTextView = view.findViewById(R.id.userName);
         userLevelTextView = view.findViewById(R.id.userLevel);

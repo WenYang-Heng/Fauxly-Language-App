@@ -18,6 +18,7 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.Achievement;
 import com.example.fauxly.ui.adapter.AchievementAdapter;
+import com.example.fauxly.utils.FragmentUtils;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class AchievementFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_achievement, container, false);
 
+        FragmentUtils.setFragmentContainerMarginBottom(requireActivity(), true);
         achievementsRecyclerView = view.findViewById(R.id.achievementsLayout);
         backButton = view.findViewById(R.id.backButton);
 
