@@ -108,7 +108,8 @@ public class ProfileFragment extends Fragment {
                 int completedQuizzes = repository.getCompletedQuizzesCount(Integer.parseInt(userId));
                 quizCompletedTextView.setText(String.valueOf(completedQuizzes));
 
-                wordsLearnedTextView.setText(String.valueOf(userStats.getWordsLearned()));
+                int learnedWordsCount = repository.getLearnedWordCount(Integer.parseInt(userId));
+                wordsLearnedTextView.setText(String.valueOf(learnedWordsCount));
                 xpEarnedTextView.setText(String.valueOf(userStats.getTotalXp()));
             }
         }

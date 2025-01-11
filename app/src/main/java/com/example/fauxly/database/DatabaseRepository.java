@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.fauxly.model.Achievement;
+import com.example.fauxly.model.DailyWord;
 import com.example.fauxly.model.FlashCard;
 import com.example.fauxly.model.FlashCardItem;
 import com.example.fauxly.model.Lesson;
@@ -17,8 +18,11 @@ import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserLanguage;
 import com.example.fauxly.model.UserStats;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DatabaseRepository {
 
@@ -711,6 +715,127 @@ public class DatabaseRepository {
 
         db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
         db.close();
+    }
+
+    public DailyWord getTodaysWord(int userId, int languageId, String proficiencyLevel) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String today = getCurrentDate();
+
+        // Check if a record for today's date exists
+        Cursor cursor = db.rawQuery(
+                "SELECT wb.word_id, wb.word, wb.pronunciation, wb.translation, wb.audio_path, wb.language_id, wb.proficiency_level, dw.date " +
+                        "FROM daily_word dw " +
+                        "JOIN word_bank wb ON dw.word_id = wb.word_id " +
+                        "WHERE dw.user_id = ? AND wb.language_id = ? AND wb.proficiency_level = ?",
+                new String[]{String.valueOf(userId), String.valueOf(languageId), proficiencyLevel});
+
+        if (cursor.moveToFirst()) {
+            String recordDate = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+
+            if (today.equals(recordDate)) {
+                // If the date matches today, return the existing word
+                int wordId = cursor.getInt(cursor.getColumnIndexOrThrow("word_id"));
+                String word = cursor.getString(cursor.getColumnIndexOrThrow("word"));
+                String pronunciation = cursor.getString(cursor.getColumnIndexOrThrow("pronunciation"));
+                String translation = cursor.getString(cursor.getColumnIndexOrThrow("translation"));
+                String audioPath = cursor.getString(cursor.getColumnIndexOrThrow("audio_path"));
+                cursor.close();
+
+                return new DailyWord(wordId, word, pronunciation, translation, audioPath, languageId, proficiencyLevel);
+            } else {
+                // If the date is outdated, delete the old record
+                db.delete("daily_word", "user_id = ? AND date = ?", new String[]{String.valueOf(userId), recordDate});
+            }
+        }
+        cursor.close();
+
+        // Select a new word for today if none exists
+        cursor = db.rawQuery(
+                "SELECT word_id, word, pronunciation, translation, audio_path, language_id, proficiency_level FROM word_bank " +
+                        "WHERE language_id = ? AND proficiency_level = ? " +
+                        "AND word_id NOT IN (SELECT word_id FROM user_word WHERE user_id = ? AND is_learned = 1) " +
+                        "ORDER BY RANDOM() LIMIT 1",
+                new String[]{String.valueOf(languageId), proficiencyLevel, String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            int wordId = cursor.getInt(cursor.getColumnIndexOrThrow("word_id"));
+            String word = cursor.getString(cursor.getColumnIndexOrThrow("word"));
+            String pronunciation = cursor.getString(cursor.getColumnIndexOrThrow("pronunciation"));
+            String translation = cursor.getString(cursor.getColumnIndexOrThrow("translation"));
+            String audioPath = cursor.getString(cursor.getColumnIndexOrThrow("audio_path"));
+
+            // Insert today's word into the daily_word table
+            ContentValues values = new ContentValues();
+            values.put("word_id", wordId);
+            values.put("date", today);
+            values.put("user_id", userId);
+            db.insertWithOnConflict("daily_word", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            cursor.close();
+            return new DailyWord(wordId, word, pronunciation, translation, audioPath, languageId, proficiencyLevel);
+        }
+        cursor.close();
+
+        return null; // No words available
+    }
+
+    public void insertUserWord(int userId, int wordId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Check if the word is already in the user_word table
+        Cursor cursor = db.rawQuery("SELECT * FROM user_word WHERE user_id = ? AND word_id = ?",
+                new String[]{String.valueOf(userId), String.valueOf(wordId)});
+        if (cursor.moveToFirst()) {
+            // Update the existing entry to mark it as learned
+            ContentValues values = new ContentValues();
+            values.put("is_learned", 1);
+            values.put("date_learned", getCurrentDate());
+
+            db.update("user_word", values, "user_id = ? AND word_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(wordId)});
+        } else {
+            // Insert a new entry
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("word_id", wordId);
+            values.put("is_learned", 1);
+            values.put("date_learned", getCurrentDate());
+
+            db.insert("user_word", null, values);
+        }
+        cursor.close();
+        db.close();
+    }
+
+    private String getCurrentDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return dateFormat.format(new Date());
+    }
+
+    private boolean isWordLearned(int userId, int wordId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_learned FROM user_word WHERE user_id = ? AND word_id = ?",
+                new String[]{String.valueOf(userId), String.valueOf(wordId)});
+        boolean isLearned = false;
+        if (cursor.moveToFirst()) {
+            isLearned = cursor.getInt(0) == 1; // Check if is_learned = 1
+        }
+        cursor.close();
+        db.close();
+        return isLearned;
+    }
+
+    public int getLearnedWordCount(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM user_word WHERE user_id = ? AND is_learned = 1",
+                new String[]{String.valueOf(userId)});
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+        return count;
     }
 
 

@@ -112,6 +112,7 @@
 
 
         <LinearLayout
+            android:id="@+id/dailyWordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
@@ -156,8 +157,19 @@
                         android:textSize="34sp"
                         android:textColor="@color/black"/>
 
+                    <TextView
+                        android:id="@+id/pronunciation"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:singleLine="false"
+                        android:text="Romanization"
+                        android:textSize="20sp"
+                        android:textColor="@color/black"/>
+
                     <ImageButton
-                        android:id="@+id/imageButton5"
+                        android:id="@+id/audioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#00FFFFFF"

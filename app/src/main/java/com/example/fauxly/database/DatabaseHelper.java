@@ -3,6 +3,7 @@ package com.example.fauxly.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -92,6 +93,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(word_id) REFERENCES word_bank(word_id), " +
                 "PRIMARY KEY(user_id, word_id)" +
                 ");");
+
+        // Daily Word Table
+        db.execSQL("CREATE TABLE daily_word (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "user_id INTEGER, " +
+                "word_id INTEGER, " +
+                "date DATE, " +
+                "FOREIGN KEY(user_id) REFERENCES user(user_id), " +
+                "FOREIGN KEY(word_id) REFERENCES word_bank(word_id)" +
+                ");");
+
+        Log.d("DatabaseHelper", "daily_word table created.");
 
         // achievement table
         db.execSQL("CREATE TABLE achievement (" +
@@ -366,6 +379,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS quiz_content;");
         db.execSQL("DROP TABLE IF EXISTS option;");
         db.execSQL("DROP TABLE IF EXISTS user_quiz;");
+        db.execSQL("DROP TABLE IF EXISTS word_bank;");
+        db.execSQL("DROP TABLE IF EXISTS user_word;");
+        db.execSQL("DROP TABLE IF EXISTS daily_word;");
         onCreate(db);
     }
 }

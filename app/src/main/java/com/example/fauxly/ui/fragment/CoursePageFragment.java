@@ -1,11 +1,14 @@
 package com.example.fauxly.ui.fragment;
 
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +18,13 @@ import android.widget.TextView;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.model.DailyWord;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserLanguage;
 import com.example.fauxly.utils.FragmentUtils;
 import com.google.android.material.button.MaterialButton;
+
+import java.io.IOException;
 
 public class CoursePageFragment extends Fragment {
 
@@ -29,6 +35,8 @@ public class CoursePageFragment extends Fragment {
     private Button changeLanguageButton;
     private MaterialButton quizBtn;
     private TextView TVUsername, TVLanguage, TVLevel;
+    private TextView wordTextView, pronunctionTextView, translatedWordTextView;
+    private ImageButton audioButton;
     private DatabaseRepository repository;
 
     public CoursePageFragment() {
@@ -63,6 +71,12 @@ public class CoursePageFragment extends Fragment {
         flashCardBtn = view.findViewById(R.id.flashCardBtn);
         quizBtn = view.findViewById(R.id.quizBtn);
 
+        // Initialize daily word
+        wordTextView = view.findViewById(R.id.word);
+        pronunctionTextView = view.findViewById(R.id.pronunciation);
+        translatedWordTextView = view.findViewById(R.id.translatedWord);
+        audioButton = view.findViewById(R.id.audioButton);
+
         // Set up back button click listener
         backButton.setOnClickListener(v -> navigateBackToHome());
 
@@ -77,7 +91,69 @@ public class CoursePageFragment extends Fragment {
         // Load user data
         loadUserData();
 
+        // load daily word
+        loadDailyWord();
+
         return view;
+    }
+
+    private void loadDailyWord() {
+        if (userId == null || userLanguage == null) {
+            wordTextView.setText("Please select a language");
+            translatedWordTextView.setText("");
+            pronunctionTextView.setText("");
+            audioButton.setVisibility(View.GONE);
+            return;
+        }
+
+        int languageId = userLanguage.getLanguageId();
+        String proficiencyLevel = userLanguage.getProficiencyLevel();
+
+        DailyWord todaysWord = repository.getTodaysWord(Integer.parseInt(userId), languageId, proficiencyLevel);
+
+        if (todaysWord != null) {
+            wordTextView.setText(todaysWord.getWord());
+            pronunctionTextView.setText(todaysWord.getPronunciation());
+            translatedWordTextView.setText(todaysWord.getTranslation());
+
+            audioButton.setVisibility(View.VISIBLE);
+            audioButton.setOnClickListener(v -> {
+                playAudio(todaysWord.getAudioPath());
+
+                if (userId != null && todaysWord != null) {
+                    markWordAsLearned(Integer.parseInt(userId), todaysWord.getWordId());
+                } else {
+                    Log.e("CoursePageFragment", "User ID or Word is null. Cannot mark as learned.");
+                }
+            });
+        } else {
+            wordTextView.setText("No new word today.");
+            translatedWordTextView.setText("");
+            audioButton.setVisibility(View.GONE);
+        }
+    }
+
+
+    private void playAudio(String audioPath) {
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            AssetFileDescriptor afd = requireContext().getAssets().openFd("audio/japanese/beginner/" + audioPath);
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void markWordAsLearned(int userId, int wordId) {
+        try {
+            repository.insertUserWord(userId, wordId);
+            Log.d("CoursePageFragment", "Word marked as learned: " + wordId);
+        } catch (Exception e) {
+            Log.e("CoursePageFragment", "Error marking word as learned: " + e.getMessage());
+        }
     }
 
     private void navigateBackToHome() {
