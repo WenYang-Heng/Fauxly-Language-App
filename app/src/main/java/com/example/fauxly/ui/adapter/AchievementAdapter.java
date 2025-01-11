@@ -10,20 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fauxly.R;
 import com.example.fauxly.model.Achievement;
+import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.List;
 
 public class AchievementAdapter extends RecyclerView.Adapter<AchievementAdapter.ViewHolder> {
 
-    public interface OnItemClickListener {
-        void onItemClick(Achievement achievement);
-    }
+    private final List<Achievement> achievements;
+    private final OnAchievementClickListener listener;
 
-    private final List<Achievement> achievementList;
-    private final OnItemClickListener listener;
-
-    public AchievementAdapter(List<Achievement> achievementList, OnItemClickListener listener) {
-        this.achievementList = achievementList;
+    public AchievementAdapter(List<Achievement> achievements, OnAchievementClickListener listener) {
+        this.achievements = achievements;
         this.listener = listener;
     }
 
@@ -36,26 +33,40 @@ public class AchievementAdapter extends RecyclerView.Adapter<AchievementAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Achievement achievement = achievementList.get(position);
-        holder.title.setText(achievement.getTitle());
-        holder.description.setText(achievement.getDescription());
+        Achievement achievement = achievements.get(position);
 
-        // Set the click listener for the item
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(achievement));
+        holder.titleTextView.setText(achievement.getTitle());
+        holder.descriptionTextView.setText(achievement.getDescription());
+
+        // Grey out the FlexboxLayout if not achieved
+        if (achievement.isAchieved()) {
+            holder.flexboxLayout.setAlpha(1.0f); // Full color
+        } else {
+            holder.flexboxLayout.setAlpha(0.5f); // Greyed out
+        }
+
+        holder.itemView.setOnClickListener(v -> listener.onAchievementClicked(achievement));
     }
 
     @Override
     public int getItemCount() {
-        return achievementList.size();
+        return achievements.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title, description;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final FlexboxLayout flexboxLayout;
+        private final TextView titleTextView;
+        private final TextView descriptionTextView;
 
-        ViewHolder(View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.achievement_title);
-            description = itemView.findViewById(R.id.achievement_description);
+            flexboxLayout = itemView.findViewById(R.id.achievementItem);
+            titleTextView = itemView.findViewById(R.id.achievement_title);
+            descriptionTextView = itemView.findViewById(R.id.achievement_description);
         }
+    }
+
+    public interface OnAchievementClickListener {
+        void onAchievementClicked(Achievement achievement);
     }
 }

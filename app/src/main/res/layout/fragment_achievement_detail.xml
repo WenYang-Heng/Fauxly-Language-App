@@ -7,11 +7,20 @@
     android:padding="16dp"
     android:background="#4E342E">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"/>
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        android:background="@android:color/transparent"
+        app:icon="@drawable/back_icon_wrapper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Image of the achievement -->
     <com.google.android.material.imageview.ShapeableImageView

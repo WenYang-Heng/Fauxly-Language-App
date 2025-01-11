@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.flexbox.FlexboxLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/achievementItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
+    app:alignItems="center"
     android:background="@drawable/achivement_background">
 
     <ImageView
         android:id="@+id/achievement_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:src="@drawable/android" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingStart="16dp">
@@ -32,6 +34,7 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"
-            android:text="Achievement Description" />
+            android:text="Achievement Description"
+            android:visibility="gone"/>
     </LinearLayout>
-</LinearLayout>
+</com.google.android.flexbox.FlexboxLayout>

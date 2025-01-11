@@ -2,66 +2,148 @@ package com.example.fauxly.ui.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fauxly.R;
+import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.model.UserStats;
+import com.example.fauxly.utils.AchievementTracker;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link QuizCompletedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class QuizCompletedFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_TITLE = "title";
+    private static final String ARG_ID = "id";
+    private static final String ARG_USER_ID = "userId";
+    private static final String ARG_IS_LESSON = "isLesson";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String title;
+    private String id;
+    private String userId;
+    private boolean isLesson;
+    private Button doneButton;
+    private DatabaseRepository repository;
 
     public QuizCompletedFragment() {
-        // Required empty public constructor
         super(R.layout.fragment_quiz_completed);
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment QuizCompletedFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static QuizCompletedFragment newInstance(String param1, String param2) {
+    public static QuizCompletedFragment newInstance(String title, String id, String userId, boolean isLesson) {
         QuizCompletedFragment fragment = new QuizCompletedFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_ID, id);
+        args.putString(ARG_USER_ID, userId);
+        args.putBoolean(ARG_IS_LESSON, isLesson);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            title = getArguments().getString(ARG_TITLE);
+            id = getArguments().getString(ARG_ID);
+            userId = getArguments().getString(ARG_USER_ID);
+            isLesson = getArguments().getBoolean(ARG_IS_LESSON);
         }
+
+        repository = new DatabaseRepository(requireContext());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_quiz_completed, container, false);
+        View view = inflater.inflate(R.layout.fragment_quiz_completed, container, false);
+
+        // Set the title
+        TextView titleTextView = view.findViewById(R.id.completedText);
+        if (title != null) {
+            titleTextView.setText("Completed " + title);
+        }
+
+        // Set up Done button
+        doneButton = view.findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(v -> {
+            updateCompletionStatus();
+            trackAchievements();
+            navigateBackToCorrectList();
+        });
+
+        return view;
+    }
+
+    private void updateCompletionStatus() {
+        if (id != null && userId != null) {
+            int userIdInt = Integer.parseInt(userId);
+
+            boolean isCompleted = isLesson
+                    ? repository.isLessonCompleted(userIdInt, id) // Check if lesson is completed
+                    : repository.isQuizCompleted(userIdInt, id); // Check if quiz is completed
+
+            if (!isCompleted) {
+                if (isLesson) {
+                    // Mark lesson as complete
+                    repository.updateUserLessonCompletion(userIdInt, id);
+                } else {
+                    // Mark quiz as complete
+                    repository.updateUserQuizCompletion(userIdInt, id);
+                }
+
+                // Fetch current stats
+                UserStats stats = repository.getUserStatsById(userIdInt);
+                if (stats != null) {
+                    // Grant 500 XP
+                    stats.setCurrentXp(stats.getCurrentXp() + 500);
+                    stats.setTotalXp(stats.getTotalXp() + 500);
+
+                    Toast.makeText(requireContext(), "You earned " + 500 + " XP!", Toast.LENGTH_SHORT).show();
+
+                    // Check for level-up
+                    while (stats.getCurrentXp() >= stats.getLevelUpXp()) {
+                        stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp()); // Carry over remaining XP
+                        stats.setCurrentLevel(stats.getCurrentLevel() + 1); // Increment the level
+
+                        Toast.makeText(requireContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel() + "!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Update the stats in the database
+                    repository.updateUserStatsXpAndLevel(
+                            userIdInt,
+                            stats.getCurrentXp(),
+                            stats.getCurrentLevel(),
+                            stats.getTotalXp()
+                    );
+                }
+            }
+        }
+    }
+
+
+    private void trackAchievements() {
+        AchievementTracker tracker = new AchievementTracker(requireContext());
+        int userIdInt = Integer.parseInt(userId);
+        tracker.evaluateAchievements(userIdInt);
+    }
+
+    private void navigateBackToCorrectList() {
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+
+        // Navigate back to the correct list fragment
+        if (isLesson) {
+            fragmentManager.popBackStack("LessonListFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        } else {
+            fragmentManager.popBackStack("QuizListFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
     }
 }

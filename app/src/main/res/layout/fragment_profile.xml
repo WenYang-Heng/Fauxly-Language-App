@@ -8,14 +8,14 @@
     android:padding="16dp">
 
     <!-- Back Button -->
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/baseline_arrow_back_24"
-        android:contentDescription="Back Button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+<!--    <ImageView-->
+<!--        android:id="@+id/backButton"-->
+<!--        android:layout_width="24dp"-->
+<!--        android:layout_height="24dp"-->
+<!--        android:src="@drawable/baseline_arrow_back_24"-->
+<!--        android:contentDescription="Back Button"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent" />-->
 
     <!-- Title -->
     <TextView
@@ -150,7 +150,7 @@
                 android:layout_marginLeft="16dp">
 
                 <TextView
-                    android:id="@+id/quizCompleted"
+                    android:id="@+id/lessonCompleted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="15"
@@ -161,7 +161,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quiz Completed"
+                    android:text="Lesson Completed"
                     android:textColor="#FFFFFF"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -195,7 +195,7 @@
                 android:layout_marginLeft="16dp">
 
                 <TextView
-                    android:id="@+id/testCompleted"
+                    android:id="@+id/quizCompleted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="15"
@@ -206,7 +206,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Test Completed"
+                    android:text="Quiz Completed"
                     android:textColor="#FFFFFF"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -333,6 +333,7 @@
                 android:textSize="20dp"/>
 
             <Button
+                android:id="@+id/achievementButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
