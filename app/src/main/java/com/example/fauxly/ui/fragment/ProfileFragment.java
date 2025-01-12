@@ -17,7 +17,9 @@ import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
+import com.example.fauxly.utils.AssetUtils;
 import com.example.fauxly.utils.FragmentUtils;
+import com.google.android.material.imageview.ShapeableImageView;
 
 public class ProfileFragment extends Fragment {
 
@@ -38,6 +40,7 @@ public class ProfileFragment extends Fragment {
     private Button achievementButton;
     private Button logoutButton;
     private ProgressBar levelProgressBar;
+    private ShapeableImageView lvlBadge;
 
     public ProfileFragment() {
         super(R.layout.fragment_profile);
@@ -77,6 +80,7 @@ public class ProfileFragment extends Fragment {
         xpEarnedTextView = view.findViewById(R.id.xpEarned);
         achievementButton = view.findViewById(R.id.achievementButton);
         logoutButton = view.findViewById(R.id.logoutButton);
+        lvlBadge = view.findViewById(R.id.lvlBadge);
 
         achievementButton.setOnClickListener(v -> navigateToAchievementFragment());
         logoutButton.setOnClickListener(v -> logout());
@@ -134,6 +138,17 @@ public class ProfileFragment extends Fragment {
                 wordsLearnedTextView.setText(String.valueOf(learnedWordsCount));
                 xpEarnedTextView.setText(String.valueOf(userStats.getTotalXp()));
             }
+
+            displayLevelBadge();
+        }
+    }
+
+    private void displayLevelBadge() {
+        if (userStats != null) {
+            int currentLevel = userStats.getCurrentLevel();
+            String badgeFileName = "lvl_badges/lvl_" + currentLevel + ".jpg";
+
+            AssetUtils.loadImageFromAssets(requireContext(), badgeFileName, lvlBadge);
         }
     }
 

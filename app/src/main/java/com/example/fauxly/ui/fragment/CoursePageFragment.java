@@ -64,7 +64,7 @@ public class CoursePageFragment extends Fragment {
         // Initialize UI elements
         backButton = view.findViewById(R.id.backButton);
         changeLanguageButton = view.findViewById(R.id.changeLanguageButton);
-        TVUsername = view.findViewById(R.id.TVUsername);
+//        TVUsername = view.findViewById(R.id.TVUsername);
         TVLanguage = view.findViewById(R.id.TVCourseTitle);
         TVLevel = view.findViewById(R.id.TVLevel);
         lessonBtn = view.findViewById(R.id.lessonBtn);
@@ -221,7 +221,7 @@ public class CoursePageFragment extends Fragment {
 
             // Update UI with user details
             if (user != null) {
-                TVUsername.setText(user.getName());
+//                TVUsername.setText(user.getName());
             }
 
             if (userLanguage != null) {

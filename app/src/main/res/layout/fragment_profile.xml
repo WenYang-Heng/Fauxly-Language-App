@@ -31,9 +31,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Profile Picture -->
+    <!-- Level Badge -->
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profilePicture"
+        android:id="@+id/lvlBadge"
         android:layout_width="100dp"
         android:layout_height="100dp"
         app:srcCompat="@drawable/man"
@@ -54,7 +54,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@id/lvlBadge"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
