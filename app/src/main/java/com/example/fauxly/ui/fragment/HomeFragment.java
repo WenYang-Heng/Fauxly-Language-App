@@ -19,7 +19,9 @@ import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
 import com.example.fauxly.utils.AchievementTracker;
+import com.example.fauxly.utils.AssetUtils;
 import com.example.fauxly.utils.FragmentUtils;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +37,8 @@ public class HomeFragment extends Fragment {
     private TextView TVUsername;
     private TextView dailyStreak;
     private ImageButton IBCourse;
+    private ShapeableImageView lvl_badge;
+    private TextView currentLevel;
 
     private OnUserIdChangeListener userIdChangeListener;
 
@@ -83,6 +87,8 @@ public class HomeFragment extends Fragment {
         TVUsername = view.findViewById(R.id.TVUsername);
         dailyStreak = view.findViewById(R.id.dailyStreak);
         IBCourse = view.findViewById(R.id.IBCourse);
+        lvl_badge = view.findViewById(R.id.lvl_badge);
+        currentLevel = view.findViewById(R.id.currentLevel);
 
         IBCourse.setOnClickListener(v -> {
             navigateToCourseFragment();
@@ -129,6 +135,8 @@ public class HomeFragment extends Fragment {
             String lastClaimDate = stats.getLastClaimDate();
             int fiveDayLoginStreak = stats.getFiveDayLoginStreak();
 
+            currentLevel.setText(String.valueOf(stats.getCurrentLevel()));
+
             // Check if it's a new day
             boolean isNewDay = shouldResetStreak(lastClaimDate);
 
@@ -145,8 +153,19 @@ public class HomeFragment extends Fragment {
 
             // Update the UI based on the streak
             updateStreakUI(fiveDayLoginStreak);
+
+            displayLevelBadge();
         } else {
             Toast.makeText(getContext(), "User stats not found!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void displayLevelBadge() {
+        if (stats != null) {
+            int currentLevel = stats.getCurrentLevel();
+            String badgeFileName = "lvl_badges/lvl_" + currentLevel + ".jpg";
+
+            AssetUtils.loadImageFromAssets(requireContext(), badgeFileName, lvl_badge);
         }
     }
 

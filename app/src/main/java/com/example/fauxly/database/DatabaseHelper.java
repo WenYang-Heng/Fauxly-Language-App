@@ -143,6 +143,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "path TEXT, " +  // File path or URL for multimedia content
                 "word TEXT, " +  // Individual word (if applicable)
                 "pronunciation TEXT, " +  // English pronunciation for the word
+                "translation TEXT, " +
                 "FOREIGN KEY(lesson_id) REFERENCES lesson(lesson_id)" +  // Links to lesson_id in lesson table
                 ");");      // lesson_content table
 
@@ -262,39 +263,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void insertDefaultLessonContent(SQLiteDatabase db) {
         // Lesson 1 Content
-        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation) VALUES " +
-                "('BL1', 1, 'Text', 'Japanese uses three writing systems: Hiragana, Katakana, and Kanji.', NULL, NULL, NULL), " +
-                "('BL1', 2, 'Text', 'Hiragana is phonetic and used for native Japanese words.', NULL, NULL, NULL), " +
-                "('BL1', 3, 'Text', 'The first five Hiragana characters are あ, い, う, え, お.', NULL, NULL, NULL), " +
-                "('BL1', 3, 'Word', NULL, 'bl1_ah', 'あ', 'A (ah)'), " +
-                "('BL1', 4, 'Word', NULL, 'bl1_ee', 'い', 'I (ee)'), " +
-                "('BL1', 5, 'Word', NULL, 'bl1_uu', 'う', 'U (oo)'), " +
-                "('BL1', 6, 'Word', NULL, 'bl1_eh', 'え', 'E (eh)'), " +
-                "('BL1', 7, 'Word', NULL, 'bl1_oh', 'お', 'O (oh)');");
+        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation, translation) VALUES " +
+                "('BL1', 1, 'Text', 'Japanese uses three writing systems: Hiragana, Katakana, and Kanji.', NULL, NULL, NULL, NULL), " +
+                "('BL1', 2, 'Text', 'Hiragana is phonetic and used for native Japanese words.', NULL, NULL, NULL, NULL), " +
+                "('BL1', 3, 'Text', 'The first five Hiragana characters are あ, い, う, え, お.', NULL, NULL, NULL, NULL), " +
+                "('BL1', 3, 'Word', NULL, 'bl1_ah.mp3', 'あ', 'A (ah)', 'Ah'), " +
+                "('BL1', 4, 'Word', NULL, 'bl1_ee.mp3', 'い', 'I (ee)', 'Ee'), " +
+                "('BL1', 5, 'Word', NULL, 'bl1_uu.mp3', 'う', 'U (oo)', 'Oo'), " +
+                "('BL1', 6, 'Word', NULL, 'bl1_eh.mp3', 'え', 'E (eh)', 'Eh'), " +
+                "('BL1', 7, 'Word', NULL, 'bl1_oh.mp3', 'お', 'O (oh)', 'Oh');");
 
-        // Lesson 2 Content
-        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation) VALUES " +
-                "('BL2', 1, 'Text', 'Learn basic greetings in Japanese.', NULL, NULL, NULL), " +
-                "('BL2', 2, 'Word', 'Hello', 'bl2_konnichiwa', 'こんにちは', 'Konnichiwa (koh-nee-chee-wah)'), " +
-                "('BL2', 3, 'Word', 'Good Morning', 'bl2_ohayou_gozaimasu', 'おはようございます', 'Ohayou gozaimasu (oh-ha-yoh goh-zai-mahs)'), " +
-                "('BL2', 4, 'Word', 'Good Evening', 'bl2_konbanwa', 'こんばんは', 'Konbanwa (kohn-bahn-wah)'), " +
-                "('BL2', 5, 'Word', 'Good Night', 'bl2_oyasuminasai', 'おやすみなさい', 'Oyasuminasai (oh-yah-soo-mee-nah-sai)'), " +
-                "('BL2', 6, 'Word', 'Thank you', 'bl2_arigatou', 'ありがとう', 'Arigatou (ah-ree-gah-toh)');");
+// Lesson 2 Content
+        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation, translation) VALUES " +
+                "('BL2', 1, 'Text', 'Learn basic greetings in Japanese.', NULL, NULL, NULL, NULL), " +
+                "('BL2', 2, 'Word', 'Hello', 'bl2_konnichiwa.mp3', 'こんにちは', 'Konnichiwa (koh-nee-chee-wah)', 'Hello'), " +
+                "('BL2', 3, 'Word', 'Good Morning', 'bl2_ohayou_gozaimasu.mp3', 'おはようございます', 'Ohayou gozaimasu (oh-ha-yoh goh-zai-mahs)', 'Good Morning'), " +
+                "('BL2', 4, 'Word', 'Good Evening', 'bl2_konbanwa.mp3', 'こんばんは', 'Konbanwa (kohn-bahn-wah)', 'Good Evening'), " +
+                "('BL2', 5, 'Word', 'Good Night', 'bl2_oyasuminasai.mp3', 'おやすみなさい', 'Oyasuminasai (oh-yah-soo-mee-nah-sai)', 'Good Night'), " +
+                "('BL2', 6, 'Word', 'Thank you', 'bl2_arigatou.mp3', 'ありがとう', 'Arigatou (ah-ree-gah-toh)', 'Thank You');");
 
-        // Lesson 3 Content
-        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation) VALUES " +
-                "('BL3', 1, 'Text', 'Learn numbers 1-10 in Japanese.', NULL, NULL, NULL), " +
-                "('BL3', 2, 'Word', 'One', 'bl3_ichi', 'いち', 'Ichi (ee-chee)'), " +
-                "('BL3', 3, 'Word', 'Two', 'bl3_ni', 'に', 'Ni (nee)'), " +
-                "('BL3', 4, 'Word', 'Three', 'bl3_san', 'さん', 'San (sahn)'), " +
-                "('BL3', 5, 'Word', 'Four', 'bl3_yon', 'よん', 'Yon (yohn)'), " +
-                "('BL3', 6, 'Word', 'Five', 'bl3_go', 'ご', 'Go (goh)'), " +
-                "('BL3', 7, 'Word', 'Six', 'bl3_roku', 'ろく', 'Roku (roh-koo)'), " +
-                "('BL3', 8, 'Word', 'Seven', 'bl3_nana', 'なな', 'Nana (nah-nah)'), " +
-                "('BL3', 9, 'Word', 'Eight', 'bl3_hachi', 'はち', 'Hachi (hah-chee)'), " +
-                "('BL3', 10, 'Word', 'Nine', 'bl3_kyuu', 'きゅう', 'Kyuu (kyoo)'), " +
-                "('BL3', 11, 'Word', 'Ten', 'bl3_juu', 'じゅう', 'Juu (joo)'), " +
-                "('BL3', 12, 'Word', 'Asking Time', 'bl3_asking_time', 'いま なんじ ですか？', 'Ima nanji desu ka? (What time is it?)');");
+// Lesson 3 Content
+        db.execSQL("INSERT INTO lesson_content (lesson_id, content_order, content_type, content_data, path, word, pronunciation, translation) VALUES " +
+                "('BL3', 1, 'Text', 'Learn numbers 1-10 in Japanese.', NULL, NULL, NULL, NULL), " +
+                "('BL3', 2, 'Word', 'One', 'bl3_ichi.mp3', 'いち', 'Ichi (ee-chee)', 'One'), " +
+                "('BL3', 3, 'Word', 'Two', 'bl3_ni.mp3', 'に', 'Ni (nee)', 'Two'), " +
+                "('BL3', 4, 'Word', 'Three', 'bl3_san.mp3', 'さん', 'San (sahn)', 'Three'), " +
+                "('BL3', 5, 'Word', 'Four', 'bl3_yon.mp3', 'よん', 'Yon (yohn)', 'Four'), " +
+                "('BL3', 6, 'Word', 'Five', 'bl3_go.mp3', 'ご', 'Go (goh)', 'Five'), " +
+                "('BL3', 7, 'Word', 'Six', 'bl3_roku.mp3', 'ろく', 'Roku (roh-koo)', 'Six'), " +
+                "('BL3', 8, 'Word', 'Seven', 'bl3_nana.mp3', 'なな', 'Nana (nah-nah)', 'Seven'), " +
+                "('BL3', 9, 'Word', 'Eight', 'bl3_hachi.mp3', 'はち', 'Hachi (hah-chee)', 'Eight'), " +
+                "('BL3', 10, 'Word', 'Nine', 'bl3_kyuu.mp3', 'きゅう', 'Kyuu (kyoo)', 'Nine'), " +
+                "('BL3', 11, 'Word', 'Ten', 'bl3_juu.mp3', 'じゅう', 'Juu (joo)', 'Ten'), " +
+                "('BL3', 12, 'Word', 'Asking Time', 'bl3_asking_time.mp3', 'いま なんじ ですか？', 'Ima nanji desu ka? (What time is it?)', 'What time is it?');");
+
 
 
         // Log the completion of data insertion

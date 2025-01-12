@@ -10,10 +10,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.example.fauxly.MainActivity;
@@ -25,18 +27,33 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginFragment extends Fragment {
 
+    private TextInputEditText emailEditText, passwordEditText;
+    private Button loginButton, registerButton;
+    private CheckBox showPassword;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         FragmentUtils.setFragmentContainerMarginBottom(requireActivity(), true);
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        TextInputEditText emailEditText = view.findViewById(R.id.emailAddress);
-        TextInputEditText passwordEditText = view.findViewById(R.id.password);
-        Button loginButton = view.findViewById(R.id.loginButton);
-        Button registerButton = view.findViewById(R.id.registerButton);
+        emailEditText = view.findViewById(R.id.emailAddress);
+        passwordEditText = view.findViewById(R.id.password);
+        loginButton = view.findViewById(R.id.loginButton);
+        registerButton = view.findViewById(R.id.registerButton);
+        showPassword = view.findViewById(R.id.showPassword);
 
         DatabaseRepository repository = new DatabaseRepository(requireContext());
+
+        showPassword.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Show password
+                passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                // Hide password
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+        });
 
         loginButton.setOnClickListener(v -> {
             String email = emailEditText.getText() != null ? emailEditText.getText().toString() : "";

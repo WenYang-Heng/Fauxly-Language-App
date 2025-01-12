@@ -145,17 +145,37 @@
         android:visibility="gone"/>
 
     <!--  Audio Button  -->
-    <Button
+
+    <!--  Flashcard Button  -->
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/audioButton"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#D95D39"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:cornerRadius="50dp"
+        app:icon="@drawable/audio_icon_wrapper"
+        app:iconPadding="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView" />
+
+    <Button
+        android:id="@+id/flashCardBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Play Audio"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="50dp"
+        android:text="Add Flashcard"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView"
-        android:visibility="gone"/>
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/audioButton" />
 
     <TextView
         android:id="@+id/feedbackTextView"

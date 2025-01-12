@@ -10,12 +10,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/backButton"
-        android:layout_width="52dp"
-        android:layout_height="52dp"
-        android:insetLeft="0dp"
-        android:insetTop="0dp"
-        android:insetRight="0dp"
-        android:insetBottom="0dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:iconPadding="0dp"
         app:iconGravity="textStart"
         android:background="@android:color/transparent"
@@ -63,15 +59,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pronunciation" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/audioButton"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:iconPadding="0dp"
+        app:cornerRadius="50dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#D95D39"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/translation"
+        app:icon="@drawable/audio_icon_wrapper"/>
+
     <Button
         android:id="@+id/addCardButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="120dp"
+        android:text="Add Card"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/translation"
-        android:text="Add Card"/>
+        app:layout_constraintTop_toBottomOf="@+id/audioButton" />
 
     <TextView
         android:id="@+id/pronunciation"
@@ -102,6 +116,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:text="Previous"
+            android:backgroundTint="#00BFA6"
             app:layout_constraintEnd_toStartOf="@+id/nextButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -111,6 +126,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:backgroundTint="#00BFA6"
             android:text="Next"
             app:layout_constraintStart_toEndOf="@+id/prevButton"
             app:layout_constraintEnd_toEndOf="parent"

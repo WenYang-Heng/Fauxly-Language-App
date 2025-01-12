@@ -260,7 +260,8 @@ public class DatabaseRepository {
                     cursor.getString(cursor.getColumnIndexOrThrow("content_data")),
                     cursor.getString(cursor.getColumnIndexOrThrow("path")),
                     cursor.getString(cursor.getColumnIndexOrThrow("word")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("pronunciation"))
+                    cursor.getString(cursor.getColumnIndexOrThrow("pronunciation")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("translation"))
             ));
         }
         cursor.close();
@@ -508,6 +509,103 @@ public class DatabaseRepository {
         }
     }
 
+    public String addWordToFlashcard(int userId, String word, String pronunciation, String translation, String audioPath) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Get the current language for the user
+        LanguageInfo languageInfo = getUserLanguageInfo(userId, db);
+        if (languageInfo == null) {
+            return "No language set for the user.";
+        }
+
+        // Create the flashcard for the language
+        int flashcardId = getOrCreateFlashcard(userId, languageInfo.languageName);
+
+        // Check if the word already exists in the flashcard
+        if (isWordInFlashcard(flashcardId, word, db)) {
+            return "The word is already in your flashcard.";
+        }
+
+        // Add the word to the flashcard content
+        insertFlashCardContent(flashcardId, word, pronunciation, translation, audioPath);
+        return "Word added successfully to your flashcard.";
+    }
+
+    private LanguageInfo getUserLanguageInfo(int userId, SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery(
+                "SELECT ul.language_id, l.name " +
+                        "FROM user_language ul " +
+                        "JOIN language l ON ul.language_id = l.language_id " +
+                        "WHERE ul.user_id = ?",
+                new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            int languageId = cursor.getInt(cursor.getColumnIndexOrThrow("language_id"));
+            String languageName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            cursor.close();
+            return new LanguageInfo(languageId, languageName);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        return null; // No language found
+    }
+
+    private int getOrCreateFlashcard(int userId, String languageName) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Check if the flashcard already exists
+        Cursor cursor = db.rawQuery(
+                "SELECT flashcard_id FROM flashcard WHERE user_id = ? AND name = ?",
+                new String[]{String.valueOf(userId), languageName});
+
+        if (cursor.moveToFirst()) {
+            int flashcardId = cursor.getInt(cursor.getColumnIndexOrThrow("flashcard_id"));
+            cursor.close();
+            return flashcardId;
+        }
+        cursor.close();
+
+        // Flashcard does not exist, create a new flashcard
+        insertFlashCard(languageName, userId);
+
+        // Fetch the new flashcard ID
+        cursor = db.rawQuery(
+                "SELECT flashcard_id FROM flashcard WHERE user_id = ? AND name = ?",
+                new String[]{String.valueOf(userId), languageName});
+
+        if (cursor.moveToFirst()) {
+            int newFlashcardId = cursor.getInt(cursor.getColumnIndexOrThrow("flashcard_id"));
+            cursor.close();
+            return newFlashcardId;
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        throw new RuntimeException("Failed to create or retrieve the flashcard.");
+    }
+
+    private boolean isWordInFlashcard(int flashcardId, String word, SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM flashcard_content WHERE flashcard_id = ? AND word = ?",
+                new String[]{String.valueOf(flashcardId), word});
+
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
+
+    private static class LanguageInfo {
+        int languageId;
+        String languageName;
+
+        LanguageInfo(int languageId, String languageName) {
+            this.languageId = languageId;
+            this.languageName = languageName;
+        }
+    }
 
     public void deleteFlashCardById(int flashCardId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

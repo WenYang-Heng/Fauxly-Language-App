@@ -16,27 +16,27 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp">
 
-        <TextView
-            android:id="@+id/TVUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textColor="#F7E4C3"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/IVProfilePicture"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <TextView-->
+<!--            android:id="@+id/TVUsername"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="TextView"-->
+<!--            android:textColor="#F7E4C3"-->
+<!--            android:textSize="16sp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/IVProfilePicture"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
-        <ImageView
-            android:id="@+id/IVProfilePicture"
-            android:layout_width="53dp"
-            android:layout_height="49dp"
-            android:layout_marginEnd="28dp"
-            android:src="@drawable/ryan_gosling"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.509" />
+<!--        <ImageView-->
+<!--            android:id="@+id/IVProfilePicture"-->
+<!--            android:layout_width="53dp"-->
+<!--            android:layout_height="49dp"-->
+<!--            android:layout_marginEnd="28dp"-->
+<!--            android:src="@drawable/ryan_gosling"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintVertical_bias="0.509" />-->
 
         <ImageButton
             android:id="@+id/backButton"
@@ -132,7 +132,9 @@
                 android:text="Today's Word"
                 android:textSize="18sp" />
 
+            <!--    Word Layout    -->
             <LinearLayout
+                android:id="@+id/wordLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -185,6 +187,39 @@
                     android:textSize="34sp"
                     android:textColor="@color/black"/>
             </LinearLayout>
+
+            <!--    Error Layout    -->
+            <LinearLayout
+                android:id="@+id/errorLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/errorText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:singleLine="false"
+                        android:text="Oops! Something went wrong"
+                        android:textSize="20sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+            </LinearLayout>
+            <Button
+                android:id="@+id/addFlashcardButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add to flashcard"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="#D95D39"/>
         </LinearLayout>
 
         <Space
