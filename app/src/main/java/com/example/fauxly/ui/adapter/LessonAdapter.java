@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fauxly.R;
 import com.example.fauxly.model.Lesson;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
@@ -39,15 +40,16 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
         Lesson lesson = lessonList.get(position);
         holder.lessonTitle.setText(lesson.getLessonTitle());
 
-        // Update UI based on completion status
+        // Update ImageView visibility based on completion status
         if (lesson.isComplete()) {
-            holder.statusTextView.setText("Completed");
+            holder.completionStatusIcon.setVisibility(View.VISIBLE);
         } else {
-            holder.statusTextView.setText("Not Completed");
+            holder.completionStatusIcon.setVisibility(View.GONE); // Hide the icon for incomplete lessons
         }
 
         holder.itemView.setOnClickListener(v -> listener.onLessonClick(lesson));
     }
+
 
     @Override
     public int getItemCount() {
@@ -55,14 +57,16 @@ public class LessonAdapter extends RecyclerView.Adapter<LessonAdapter.LessonView
     }
 
     static class LessonViewHolder extends RecyclerView.ViewHolder {
-        TextView lessonTitle, statusTextView;
+        TextView lessonTitle;
+        ShapeableImageView completionStatusIcon;
 
         public LessonViewHolder(@NonNull View itemView) {
             super(itemView);
             lessonTitle = itemView.findViewById(R.id.lessonTitle);
-            statusTextView = itemView.findViewById(R.id.lessonStatus); // Add this TextView in lesson_item.xml
+            completionStatusIcon = itemView.findViewById(R.id.completionStatusIcon);
         }
     }
+
 }
 
 

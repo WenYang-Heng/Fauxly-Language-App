@@ -22,23 +22,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Image of the achievement -->
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profilePicture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:srcCompat="@drawable/android"
-        android:layout_gravity="center"
-        app:shapeAppearanceOverlay="@style/circleImageView"
-        android:padding="1dp"
-        android:layout_marginTop="100dp" />
+<!--    &lt;!&ndash; Image of the achievement &ndash;&gt;-->
+<!--    <com.google.android.material.imageview.ShapeableImageView-->
+<!--        android:id="@+id/profilePicture"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="100dp"-->
+<!--        app:srcCompat="@drawable/android"-->
+<!--        android:layout_gravity="center"-->
+<!--        app:shapeAppearanceOverlay="@style/circleImageView"-->
+<!--        android:padding="1dp"-->
+<!--        android:layout_marginTop="100dp" />-->
 
     <!-- Title -->
     <TextView
         android:id="@+id/achievement_detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="200dp"
         android:layout_gravity="center"
         android:text="Achievement Title"
         android:textSize="24sp"

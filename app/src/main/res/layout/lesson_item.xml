@@ -22,13 +22,19 @@
             android:textColor="@android:color/white"
             android:text="Achievement Title" />
 
-        <TextView
-            android:id="@+id/lessonStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Not Completed"
-            android:textColor="#FF0000"
-            android:layout_marginStart="8dp"
-            android:textSize="12sp" />
+<!--        <TextView-->
+<!--            android:id="@+id/lessonStatus"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Not Completed"-->
+<!--            android:textColor="#FF0000"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:textSize="12sp" />-->
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/completionStatusIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:srcCompat="@drawable/checked"/>
     </com.google.android.flexbox.FlexboxLayout>
 </LinearLayout>

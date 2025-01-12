@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fauxly.R;
 import com.example.fauxly.model.Quiz;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
         // Update UI based on completion status
         if (quiz.isComplete()) {
-            holder.statusTextView.setText("Completed");
+            holder.completionStatusIcon.setVisibility(View.VISIBLE);
         } else {
-            holder.statusTextView.setText("Not Completed");
+            holder.completionStatusIcon.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> listener.onQuizClick(quiz));
@@ -55,12 +56,13 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     }
 
     static class QuizViewHolder extends RecyclerView.ViewHolder {
-        TextView quizTitle, statusTextView;
+        TextView quizTitle;
+        ShapeableImageView completionStatusIcon;
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
             quizTitle = itemView.findViewById(R.id.quizTitle);
-            statusTextView = itemView.findViewById(R.id.quizStatus); // Ensure this TextView is added in quiz_item.xml
+            completionStatusIcon = itemView.findViewById(R.id.completionStatusIcon); // Ensure this TextView is added in quiz_item.xml
         }
     }
 }
