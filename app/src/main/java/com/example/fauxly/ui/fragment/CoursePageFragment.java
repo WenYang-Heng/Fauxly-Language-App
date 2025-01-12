@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
@@ -32,12 +33,13 @@ public class CoursePageFragment extends Fragment {
     private User user;
     private UserLanguage userLanguage;
     private ImageButton backButton, lessonBtn, flashCardBtn;
-    private Button changeLanguageButton;
+    private Button changeLanguageButton, addFlashcardButton;
     private MaterialButton quizBtn;
     private TextView TVUsername, TVLanguage, TVLevel;
     private TextView wordTextView, pronunctionTextView, translatedWordTextView;
     private ImageButton audioButton;
     private DatabaseRepository repository;
+    private DailyWord todaysWord;
 
     public CoursePageFragment() {
         // Required empty public constructor
@@ -70,6 +72,7 @@ public class CoursePageFragment extends Fragment {
         lessonBtn = view.findViewById(R.id.lessonBtn);
         flashCardBtn = view.findViewById(R.id.flashCardBtn);
         quizBtn = view.findViewById(R.id.quizBtn);
+        addFlashcardButton = view.findViewById(R.id.addFlashcardButton);
 
         // Initialize daily word
         wordTextView = view.findViewById(R.id.word);
@@ -94,7 +97,32 @@ public class CoursePageFragment extends Fragment {
         // load daily word
         loadDailyWord();
 
+        addFlashcardButton.setVisibility(userLanguage != null ? View.VISIBLE : View.GONE);
+        addFlashcardButton.setOnClickListener(v -> addDailyWordToFlashcard());
+
         return view;
+    }
+
+    private void addDailyWordToFlashcard() {
+        if (userId == null || userLanguage == null) {
+            Toast.makeText(requireContext(), "Please select a language to add words to flashcard.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (todaysWord == null || todaysWord.getWord() == null || todaysWord.getWord().isEmpty()) {
+            Toast.makeText(requireContext(), "No word to add to flashcard.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String message = repository.addWordToFlashcard(
+                Integer.parseInt(userId),
+                todaysWord.getWord(),
+                todaysWord.getPronunciation(),
+                todaysWord.getTranslation(),
+                todaysWord.getAudioPath()
+        );
+
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     private void loadDailyWord() {
@@ -109,7 +137,7 @@ public class CoursePageFragment extends Fragment {
         int languageId = userLanguage.getLanguageId();
         String proficiencyLevel = userLanguage.getProficiencyLevel();
 
-        DailyWord todaysWord = repository.getTodaysWord(Integer.parseInt(userId), languageId, proficiencyLevel);
+        todaysWord = repository.getTodaysWord(Integer.parseInt(userId), languageId, proficiencyLevel);
 
         if (todaysWord != null) {
             wordTextView.setText(todaysWord.getWord());

@@ -185,6 +185,13 @@
                     android:textSize="34sp"
                     android:textColor="@color/black"/>
             </LinearLayout>
+            <Button
+                android:id="@+id/addFlashcardButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add to flashcard"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="#D95D39"/>
         </LinearLayout>
 
         <Space
