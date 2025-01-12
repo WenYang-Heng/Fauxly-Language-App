@@ -1,11 +1,13 @@
 package com.example.fauxly.ui.fragment;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class RegisterFragment extends Fragment {
 
     private TextInputEditText nameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
+    private CheckBox showPassword;
     private DatabaseRepository repository;
 
     public RegisterFragment() {
@@ -38,8 +41,21 @@ public class RegisterFragment extends Fragment {
         confirmPasswordEditText = view.findViewById(R.id.confirmPasswordInput);
         MaterialButton backButton = view.findViewById(R.id.backButton);
         MaterialButton signUpButton = view.findViewById(R.id.signUpButton);
+        showPassword = view.findViewById(R.id.showPassword);
 
         repository = new DatabaseRepository(requireContext());
+
+        showPassword.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Show password
+                passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                confirmPasswordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                // Hide password
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                confirmPasswordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+        });
 
         // Back button logic
         backButton.setOnClickListener(v -> {
