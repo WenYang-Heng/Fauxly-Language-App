@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,11 +36,13 @@ public class CoursePageFragment extends Fragment {
     private ImageButton backButton, lessonBtn, flashCardBtn;
     private Button changeLanguageButton, addFlashcardButton;
     private MaterialButton quizBtn;
-    private TextView TVUsername, TVLanguage, TVLevel;
-    private TextView wordTextView, pronunctionTextView, translatedWordTextView;
+    private TextView TVLanguage, TVLevel;
+    private TextView wordTextView, pronunctionTextView, translatedWordTextView, errorText;
     private ImageButton audioButton;
     private DatabaseRepository repository;
     private DailyWord todaysWord;
+    private LinearLayout wordLayout;
+    private LinearLayout errorLayout;
 
     public CoursePageFragment() {
         // Required empty public constructor
@@ -73,6 +76,9 @@ public class CoursePageFragment extends Fragment {
         flashCardBtn = view.findViewById(R.id.flashCardBtn);
         quizBtn = view.findViewById(R.id.quizBtn);
         addFlashcardButton = view.findViewById(R.id.addFlashcardButton);
+        wordLayout = view.findViewById(R.id.wordLayout);
+        errorLayout = view.findViewById(R.id.errorLayout);
+        errorText = view.findViewById(R.id.errorText);
 
         // Initialize daily word
         wordTextView = view.findViewById(R.id.word);
@@ -127,12 +133,17 @@ public class CoursePageFragment extends Fragment {
 
     private void loadDailyWord() {
         if (userId == null || userLanguage == null) {
-            wordTextView.setText("Please select a language");
-            translatedWordTextView.setText("");
-            pronunctionTextView.setText("");
-            audioButton.setVisibility(View.GONE);
+            // Show error layout and hide word layout
+            wordLayout.setVisibility(View.GONE);
+            errorLayout.setVisibility(View.VISIBLE);
+
+            errorText.setText("Please select a language to view today's word.");
             return;
         }
+
+        // Hide error layout and show word layout
+        wordLayout.setVisibility(View.VISIBLE);
+        errorLayout.setVisibility(View.GONE);
 
         int languageId = userLanguage.getLanguageId();
         String proficiencyLevel = userLanguage.getProficiencyLevel();
