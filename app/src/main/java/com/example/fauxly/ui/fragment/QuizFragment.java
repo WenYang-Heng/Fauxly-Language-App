@@ -40,7 +40,7 @@ public class QuizFragment extends Fragment {
     private Button nextQuizButton;
     private Button nextButton;
     private Button prevButton;
-    private Button audioButton;
+    private MaterialButton audioButton;
     private Button flashcardButton;
     private MaterialButton backButton;
     private TextView feedbackTextView;
