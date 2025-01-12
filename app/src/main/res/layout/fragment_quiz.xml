@@ -149,13 +149,24 @@
         android:id="@+id/audioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Play Audio"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Play Audio"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView" />
 
+    <!--  Flashcard Button  -->
+    <Button
+        android:id="@+id/flashCardBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="36dp"
+        android:text="Add Flashcard"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationTextView" />
 
     <TextView
         android:id="@+id/feedbackTextView"

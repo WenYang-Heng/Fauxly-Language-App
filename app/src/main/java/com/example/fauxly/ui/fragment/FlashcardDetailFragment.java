@@ -1,6 +1,8 @@
 package com.example.fauxly.ui.fragment;
 
 import android.app.AlertDialog;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import com.example.fauxly.database.DatabaseRepository;
 import com.example.fauxly.model.FlashCardItem;
 import com.google.android.material.button.MaterialButton;
 
+import java.io.IOException;
 import java.util.List;
 
 public class FlashcardDetailFragment extends Fragment {
@@ -34,7 +37,7 @@ public class FlashcardDetailFragment extends Fragment {
 
     private TextView wordTextView, pronunciationTextView, translationTextView, counterTextView;
     private Button nextButton, prevButton, addCardButton;
-    private MaterialButton backButton;
+    private MaterialButton backButton, audioButton;
     private int currentIndex = 0;
 
     public static FlashcardDetailFragment newInstance(int flashCardId, String flashCardName) {
@@ -71,6 +74,7 @@ public class FlashcardDetailFragment extends Fragment {
         prevButton = view.findViewById(R.id.prevButton);
         backButton = view.findViewById(R.id.backButton);
         addCardButton = view.findViewById(R.id.addCardButton);
+        audioButton = view.findViewById(R.id.audioButton);
 
         addCardButton.setOnClickListener(v -> showAddCardDialog());
 
@@ -142,6 +146,7 @@ public class FlashcardDetailFragment extends Fragment {
 
             prevButton.setEnabled(false);
             nextButton.setEnabled(false);
+            audioButton.setVisibility(View.GONE);
 
             android.util.Log.e("FlashcardDetailFragment", "No items available for this flashcard.");
             return;
@@ -155,10 +160,30 @@ public class FlashcardDetailFragment extends Fragment {
         translationTextView.setText(item.getTranslation());
         counterTextView.setText((currentIndex + 1) + " / " + flashCardItems.size());
 
+        if (item.getPath() != null && !item.getPath().isEmpty()) {
+            audioButton.setVisibility(View.VISIBLE);
+            audioButton.setOnClickListener(v -> playAudio(item.getPath()));
+        } else {
+            audioButton.setVisibility(View.GONE);
+        }
+
         // Enable/disable navigation buttons
         prevButton.setEnabled(currentIndex > 0);
         nextButton.setEnabled(currentIndex < flashCardItems.size() - 1);
     }
 
-
+    private void playAudio(String audioPath) {
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            AssetFileDescriptor afd = requireContext().getAssets().openFd("audio/japanese/beginner/" + audioPath);
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "Audio file not found", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -9,9 +9,10 @@ public class LessonContent {
     private String path;         // File path or URL for multimedia content
     private String word;         // Individual word (if applicable)
     private String pronunciation; // English pronunciation for the word
+    private String translation;
 
     // Constructor
-    public LessonContent(int contentId, String lessonId, int contentOrder, String contentType, String contentData, String path, String word, String pronunciation) {
+    public LessonContent(int contentId, String lessonId, int contentOrder, String contentType, String contentData, String path, String word, String pronunciation, String translation) {
         this.contentId = contentId;
         this.lessonId = lessonId;
         this.contentOrder = contentOrder;
@@ -20,6 +21,15 @@ public class LessonContent {
         this.path = path;
         this.word = word;
         this.pronunciation = pronunciation;
+        this.translation = translation;
+    }
+
+    public String getTranslation() {
+        return translation;
+    }
+
+    public void setTranslation(String translation) {
+        this.translation = translation;
     }
 
     // Getters and Setters

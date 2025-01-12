@@ -1,5 +1,6 @@
 package com.example.fauxly.ui.fragment;
 
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
@@ -39,6 +41,7 @@ public class QuizFragment extends Fragment {
     private Button nextButton;
     private Button prevButton;
     private Button audioButton;
+    private Button flashcardButton;
     private MaterialButton backButton;
     private TextView feedbackTextView;
     private TextView questionText;
@@ -75,6 +78,7 @@ public class QuizFragment extends Fragment {
         nextButton = rootView.findViewById(R.id.nextButton);
         prevButton = rootView.findViewById(R.id.prevButton);
         backButton = rootView.findViewById(R.id.backButton);
+        flashcardButton = rootView.findViewById(R.id.flashCardBtn);
         audioButton = rootView.findViewById(R.id.audioButton);
         feedbackTextView = rootView.findViewById(R.id.feedbackTextView);
         questionText = rootView.findViewById(R.id.questionText);
@@ -190,6 +194,7 @@ public class QuizFragment extends Fragment {
         wordsTextView.setVisibility(View.GONE);
         pronunciationTextView.setVisibility(View.GONE);
         questionText.setVisibility(View.GONE);
+        flashcardButton.setVisibility(View.GONE);
 
         switch (content.getContentType()) {
             case "Text":
@@ -216,6 +221,8 @@ public class QuizFragment extends Fragment {
                     audioButton.setVisibility(View.VISIBLE);
                     audioButton.setOnClickListener(v -> playAudio(content.getPath()));
                 }
+                flashcardButton.setVisibility(View.VISIBLE);
+                flashcardButton.setOnClickListener(v -> addToFlashcard(content));
                 break;
 
             case "Image":
@@ -237,16 +244,43 @@ public class QuizFragment extends Fragment {
         nextButton.setEnabled(index < contents.size()); // Enable for all valid contents
     }
 
+    private void addToFlashcard(LessonContent content) {
+        if (content.getWord() == null || content.getWord().isEmpty()) {
+            Toast.makeText(requireContext(), "No word available to add.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String message = repository.addWordToFlashcard(
+                Integer.parseInt(userId),
+                content.getWord(),
+                content.getPronunciation(),
+                content.getTranslation(),
+                content.getPath()
+        );
+
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
     private void playAudio(String audioPath) {
-        int resId = getResources().getIdentifier(audioPath, "raw", getContext().getPackageName());
-        if (resId != 0) {
-            MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), resId);
-            if (mediaPlayer != null) {
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-            }
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            AssetFileDescriptor afd = requireContext().getAssets().openFd("audio/japanese/beginner/" + audioPath);
+
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            mediaPlayer.setOnCompletionListener(mp -> {
+                mediaPlayer.release();
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "Error playing audio", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void loadQuizContent(String quizId) {
         quizContents = repository.getQuizContents(quizId);
