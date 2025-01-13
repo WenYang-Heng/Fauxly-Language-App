@@ -75,26 +75,38 @@ public class RegisterFragment extends Fragment {
         String password = passwordEditText.getText() != null ? passwordEditText.getText().toString().trim() : "";
         String confirmPassword = confirmPasswordEditText.getText() != null ? confirmPasswordEditText.getText().toString().trim() : "";
 
+        // Check for empty fields
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
             showToast("All fields are required");
             return;
         }
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        // Simple email regex validation
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+        if (!email.matches(emailRegex)) {
             showToast("Invalid email format");
             return;
         }
 
+        // Check password length
+        if (password.length() < 5) {
+            showToast("Password must be at least 5 characters long");
+            return;
+        }
+
+        // Check if passwords match
         if (!password.equals(confirmPassword)) {
             showToast("Passwords do not match");
             return;
         }
 
+        // Check if email already exists in the database
         if (repository.isEmailExists(email)) {
             showToast("Email is already registered");
             return;
         }
 
+        // Insert user into the database
         long userId = repository.insertUser(name, email, password);
         if (userId > 0) {
             showToast("Registration successful");
@@ -103,6 +115,7 @@ public class RegisterFragment extends Fragment {
             showToast("Registration failed");
         }
     }
+
 
     private void navigateToLogin() {
         NavController navController = NavHostFragment.findNavController(this);

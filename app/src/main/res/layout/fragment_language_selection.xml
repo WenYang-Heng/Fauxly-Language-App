@@ -84,8 +84,7 @@
             android:padding="16dp"
             android:gravity="center"
             android:layout_marginBottom="8dp"
-            android:drawableLeft="@drawable/korea_icon_wrapper"
-            android:enabled="false"/>
+            android:drawableLeft="@drawable/korea_icon_wrapper" />
     </RadioGroup>
 
     <!-- Continue Button -->
