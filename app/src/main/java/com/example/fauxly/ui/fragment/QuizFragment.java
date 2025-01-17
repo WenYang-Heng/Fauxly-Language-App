@@ -310,7 +310,7 @@ public class QuizFragment extends Fragment {
         }
 
         // Set progress bar max value
-        contentProgress.setMax(contents.size());
+        contentProgress.setMax(quizContents.size());
 
         currentIndex = 0;
         displayQuizContent(quizContents.get(currentIndex));
