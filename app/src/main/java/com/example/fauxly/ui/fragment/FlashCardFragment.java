@@ -28,7 +28,7 @@ public class FlashCardFragment extends Fragment {
 
     private String userId;
     private RecyclerView recyclerView;
-    private ImageButton addButton;
+    private MaterialButton addButton;
     private MaterialButton backButton;
     private FlashCardAdapter adapter;
     private DatabaseRepository repository;

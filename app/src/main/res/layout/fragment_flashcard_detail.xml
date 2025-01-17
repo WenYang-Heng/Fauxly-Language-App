@@ -76,16 +76,17 @@
         app:layout_constraintTop_toBottomOf="@id/translation"
         app:icon="@drawable/audio_icon_wrapper"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addCardButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:layout_marginTop="120dp"
         android:text="Add Card"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/audioButton" />
+        app:layout_constraintTop_toBottomOf="@+id/audioButton"
+        app:icon="@drawable/add_icon_wrapper"/>
 
     <TextView
         android:id="@+id/pronunciation"

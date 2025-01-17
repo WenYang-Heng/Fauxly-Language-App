@@ -6,5 +6,6 @@
       android:icon="@drawable/baseline_home_24"/>
   <item
       android:id="@+id/profileFragment"
-      android:title="Profile"/>
+      android:title="Profile"
+      android:icon="@drawable/user"/>
 </menu>

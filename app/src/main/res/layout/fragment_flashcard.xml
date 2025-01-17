@@ -49,15 +49,16 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Add Button -->
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addButton"
-        android:layout_width="101dp"
+        android:layout_width="wrap_content"
         android:layout_height="74dp"
         android:layout_marginBottom="40dp"
-        android:background="@drawable/empty_divider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/btn_round_add" />
+        android:backgroundTint="#D95D39"
+        android:text="Add Flashcard"
+        app:icon="@drawable/add_icon_wrapper"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

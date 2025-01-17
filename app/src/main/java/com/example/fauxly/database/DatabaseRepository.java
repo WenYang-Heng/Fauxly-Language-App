@@ -1030,5 +1030,14 @@ public class DatabaseRepository {
         return title;
     }
 
+    public void resetFiveDayStreak(int userId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("five_day_login_streak", 0); // Reset only the five-day streak
+        db.update("user_stats", values, "user_id = ?", new String[]{String.valueOf(userId)});
+        db.close();
+    }
+
+
 
 }

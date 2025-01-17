@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -41,13 +42,16 @@ public class QuizFragment extends Fragment {
     private Button nextButton;
     private Button prevButton;
     private MaterialButton audioButton;
-    private Button flashcardButton;
+    private MaterialButton flashcardButton;
     private MaterialButton backButton;
     private TextView feedbackTextView;
     private TextView questionText;
     private TextView wordsTextView;
     private TextView pronunciationTextView;
     private TextView lessonTitleTV;
+    private TextView titleTV;
+    private ProgressBar contentProgress;
+    private TextView progressText;
 
     private DatabaseRepository repository;
 
@@ -85,6 +89,9 @@ public class QuizFragment extends Fragment {
         wordsTextView = rootView.findViewById(R.id.wordsTextView);
         pronunciationTextView = rootView.findViewById(R.id.pronunciationTextView);
         lessonTitleTV = rootView.findViewById(R.id.lessonTitle);
+        titleTV = rootView.findViewById(R.id.titleTV);
+        contentProgress = rootView.findViewById(R.id.contentProgress);
+        progressText = rootView.findViewById(R.id.progressText);
 
         confirmButton.setVisibility(View.GONE);
 
@@ -104,10 +111,12 @@ public class QuizFragment extends Fragment {
 
             if (id != null && isLessonId(id)) {
                 Log.d("QuizFragment", "Lesson/Quiz ID: " + id);
+                titleTV.setText("Lesson");
                 loadLessonContent(id);
                 toggleButtonVisibilityForLesson(); // Toggle visibility for lessons
             } else if (id != null && isQuizId(id)) {
                 Log.d("QuizFragment", "Lesson/Quiz ID: " + id);
+                titleTV.setText("Quiz");
                 loadQuizContent(id);
                 toggleButtonVisibilityForQuiz(); // Toggle visibility for quizzes
             }
@@ -164,6 +173,9 @@ public class QuizFragment extends Fragment {
             return;
         }
 
+        // Set progress bar max value
+        contentProgress.setMax(contents.size());
+
         // Display the first content
         displayLessonContent(currentIndex);
 
@@ -195,6 +207,10 @@ public class QuizFragment extends Fragment {
         pronunciationTextView.setVisibility(View.GONE);
         questionText.setVisibility(View.GONE);
         flashcardButton.setVisibility(View.GONE);
+
+        // Update progress bar and text
+        contentProgress.setProgress(index + 1); // Progress is 1-based
+        progressText.setText((index + 1) + "/" + contents.size());
 
         switch (content.getContentType()) {
             case "Text":
@@ -293,6 +309,9 @@ public class QuizFragment extends Fragment {
             return;
         }
 
+        // Set progress bar max value
+        contentProgress.setMax(contents.size());
+
         currentIndex = 0;
         displayQuizContent(quizContents.get(currentIndex));
 
@@ -319,6 +338,10 @@ public class QuizFragment extends Fragment {
 
         // Set the question text
         questionText.setText(content.getTitle());
+
+        // Update progress bar and text
+        contentProgress.setProgress(currentIndex + 1); // Progress is 1-based
+        progressText.setText((currentIndex + 1) + "/" + quizContents.size());
 
         // Retrieve options for the current content
         List<Option> options = repository.getOptionsByContentId(content.getContentId());

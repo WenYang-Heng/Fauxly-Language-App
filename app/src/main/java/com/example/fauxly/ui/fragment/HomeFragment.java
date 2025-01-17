@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import com.example.fauxly.MainActivity;
 import com.example.fauxly.R;
 import com.example.fauxly.database.DatabaseRepository;
+import com.example.fauxly.database.HomePageRepository;
 import com.example.fauxly.model.User;
 import com.example.fauxly.model.UserStats;
 import com.example.fauxly.utils.AchievementTracker;
@@ -26,11 +28,13 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
     private static final String ARG_USER_ID = "userId";
     private LinearLayout day1, day2, day3, day4, day5;
     private DatabaseRepository repository;
+    private HomePageRepository homePageRepository;
     private String userId;
     private UserStats stats;
     private User user;
@@ -39,6 +43,8 @@ public class HomeFragment extends Fragment {
     private ImageButton IBCourse;
     private ShapeableImageView lvl_badge;
     private TextView currentLevel;
+    private String testCurrentDate = null; // Use this for testing, set to null to use the real date.
+
 
     private OnUserIdChangeListener userIdChangeListener;
 
@@ -67,6 +73,7 @@ public class HomeFragment extends Fragment {
             userId = ((MainActivity) requireActivity()).getUserId();
         }
         repository = new DatabaseRepository(requireContext());
+        homePageRepository = new HomePageRepository(requireContext());
     }
 
 
@@ -129,36 +136,60 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchUserStats() {
-        stats = repository.getUserStatsById(Integer.parseInt(userId)); // Replace with actual user ID logic
+        stats = repository.getUserStatsById(Integer.parseInt(userId));
 
         if (stats != null) {
             String lastClaimDate = stats.getLastClaimDate();
             int fiveDayLoginStreak = stats.getFiveDayLoginStreak();
 
+            Log.d("FetchUserStats", "Fetched stats for user: " + userId);
+            Log.d("FetchUserStats", "Last Claim Date: " + lastClaimDate);
+            Log.d("FetchUserStats", "Five Day Login Streak: " + fiveDayLoginStreak);
+
             currentLevel.setText(String.valueOf(stats.getCurrentLevel()));
 
             // Check if it's a new day
             boolean isNewDay = shouldResetStreak(lastClaimDate);
+            Log.d("FetchUserStats", "Is New Day: " + isNewDay);
 
-            // If it's a new day and the streak is completed (5 days), reset
-            if (fiveDayLoginStreak == 5 && isNewDay) {
-                repository.resetUserStreak(Integer.parseInt(userId)); // Reset streak in database
-                fiveDayLoginStreak = 0; // Reset local streak
-                Toast.makeText(getContext(), "Streak reset! Start again.", Toast.LENGTH_SHORT).show();
-            } else if (isNewDay) {
-                // Reset streak for missed claim
-                repository.resetUserStreak(Integer.parseInt(userId));
-                fiveDayLoginStreak = 0; // Reset local streak
+            if (isNewDay) {
+                long daysDifference = getDaysDifference(lastClaimDate, testCurrentDate); // Calculate days difference
+                Log.d("FetchUserStats", "Days Difference: " + daysDifference);
+
+                if (daysDifference > 1) {
+                    // User missed a day, reset the streak
+                    Log.d("FetchUserStats", "Missed a day. Resetting streak...");
+                    stats.setTotalLoginStreak(0);
+                    stats.setFiveDayLoginStreak(0);
+                    repository.resetUserStreak(Integer.parseInt(userId)); // Reset streak in database
+                    fiveDayLoginStreak = 0; // Reset local streak
+                    Toast.makeText(getContext(), "You missed a day! Streak reset.", Toast.LENGTH_SHORT).show();
+                } else if (fiveDayLoginStreak == 5) {
+                    // Streak is complete and it's a new day
+                    Log.d("FetchUserStats", "Five-day streak complete. Resetting streak...");
+                    repository.resetUserStreak(Integer.parseInt(userId)); // Reset streak in database
+                    fiveDayLoginStreak = 0; // Reset local streak
+                    Toast.makeText(getContext(), "Streak reset! Start again.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Streak continues for a new day
+                    Log.d("FetchUserStats", "New day detected. Streak continues.");
+                }
+            } else {
+                Log.d("FetchUserStats", "No reset needed. Either it's not a new day or streak is incomplete.");
             }
+
 
             // Update the UI based on the streak
             updateStreakUI(fiveDayLoginStreak);
+            Log.d("FetchUserStats", "UI updated with streak: " + fiveDayLoginStreak);
 
             displayLevelBadge();
         } else {
+            Log.e("FetchUserStats", "User stats not found for userId: " + userId);
             Toast.makeText(getContext(), "User stats not found!", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void displayLevelBadge() {
         if (stats != null) {
@@ -171,20 +202,37 @@ public class HomeFragment extends Fragment {
 
 
     private boolean shouldResetStreak(String lastClaimDate) {
-        if (lastClaimDate == null || lastClaimDate.isEmpty()) return true;
+        if (lastClaimDate == null || lastClaimDate.isEmpty()) {
+            Log.d("DailyClaim", "No last claim date found. Streak should reset.");
+            return true; // No last claim, reset streak
+        }
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date lastDate = dateFormat.parse(lastClaimDate);
-            Date currentDate = new Date();
+            Date currentDate = testCurrentDate != null
+                    ? dateFormat.parse(testCurrentDate) // Use test date if set
+                    : new Date(); // Use real current date otherwise
 
-            // Check if the current date is more than 1 day after the last claim date
-            return !dateFormat.format(currentDate).equals(dateFormat.format(lastDate));
+            long differenceInMillis = currentDate.getTime() - lastDate.getTime();
+            long daysDifference = differenceInMillis / (24 * 60 * 60 * 1000);
+
+            Log.d("DailyClaim", "Last Claim Date: " + dateFormat.format(lastDate));
+            Log.d("DailyClaim", "Current Date: " + dateFormat.format(currentDate));
+            Log.d("DailyClaim", "Days Difference: " + daysDifference);
+
+            // Change logic to reset for 1 or more days
+            boolean shouldReset = daysDifference >= 1;
+            Log.d("DailyClaim", "Should Reset Streak: " + shouldReset);
+
+            return shouldReset;
         } catch (Exception e) {
             e.printStackTrace();
-            return true; // Reset streak on parsing errors
+            Log.e("DailyClaim", "Error parsing dates: " + e.getMessage());
+            return true; // Default to reset on error
         }
     }
+
 
     private void updateStreakUI(int fiveDayLoginStreak) {
         // Reset all days to default disabled state
@@ -234,59 +282,127 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean canClaimForToday() {
-        if (stats.getLastClaimDate() == null) return true;
+        String lastClaimDate = stats.getLastClaimDate();
+
+        if (lastClaimDate == null || lastClaimDate.isEmpty()) {
+            Log.d("DailyClaim", "No last claim date found. Claim is allowed.");
+            return true; // No last claim, allow claiming
+        }
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date lastClaimDate = dateFormat.parse(stats.getLastClaimDate());
-            Date currentDate = new Date();
+            dateFormat.setTimeZone(TimeZone.getDefault()); // Explicitly set time zone
 
-            // Return true if last claim date is not the same as today's date
-            return !dateFormat.format(lastClaimDate).equals(dateFormat.format(currentDate));
+            Date lastDate = dateFormat.parse(lastClaimDate);
+            Date currentDate = testCurrentDate != null
+                    ? dateFormat.parse(testCurrentDate) // Use test date if set
+                    : new Date(); // Use real current date otherwise
+
+            Log.d("DailyClaim", "System Time: " + currentDate.toString());
+            Log.d("DailyClaim", "Last Claim Date: " + dateFormat.format(lastDate));
+            Log.d("DailyClaim", "Formatted Current Date: " + dateFormat.format(currentDate));
+
+            long differenceInMillis = currentDate.getTime() - lastDate.getTime();
+            long daysDifference = differenceInMillis / (24 * 60 * 60 * 1000);
+
+            Log.d("DailyClaim", "Days Difference: " + daysDifference);
+
+            boolean canClaim = daysDifference > 0;
+            Log.d("DailyClaim", "Can Claim Today: " + canClaim);
+
+            return canClaim;
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("DailyClaim", "Error parsing dates: " + e.getMessage());
             return false;
         }
     }
 
+
     private void claimXP(LinearLayout day, int dayNumber) {
-        // Get the current date
+        Log.d("DailyClaim", "Attempting to claim XP for Day " + dayNumber);
+
+        if (!canClaimForToday()) {
+            Log.d("DailyClaim", "Claim denied. User already claimed today.");
+            Toast.makeText(getContext(), "You can only claim once per day!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String currentDate = dateFormat.format(new Date());
+        String currentDate = testCurrentDate != null ? testCurrentDate : dateFormat.format(new Date());
+
+        Log.d("DailyClaim", "Claiming XP. Current Date: " + currentDate);
 
         int xpGained = 200;
         stats.setCurrentXp(stats.getCurrentXp() + xpGained);
         stats.setTotalXp(stats.getTotalXp() + xpGained); // Update total XP
 
-        // Check if user needs to level up
-        if (stats.getCurrentXp() >= stats.getLevelUpXp()) {
-            stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp()); // Carry over remaining XP
-            stats.setCurrentLevel(stats.getCurrentLevel() + 1); // Increment the level
+        Log.d("DailyClaim", "XP Gained: " + xpGained);
+        Log.d("DailyClaim", "Current XP: " + stats.getCurrentXp());
+        Log.d("DailyClaim", "Total XP: " + stats.getTotalXp());
 
-            // Notify the user
-            Toast.makeText(getContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel(), Toast.LENGTH_SHORT).show();
+        if (stats.getCurrentXp() >= stats.getLevelUpXp()) {
+            while (stats.getCurrentXp() >= stats.getLevelUpXp()) {
+                stats.setCurrentXp(stats.getCurrentXp() - stats.getLevelUpXp());
+                stats.setCurrentLevel(stats.getCurrentLevel() + 1);
+
+                Log.d("DailyClaim", "Leveled up! New Level: " + stats.getCurrentLevel());
+            }
+            Toast.makeText(getContext(), "Congratulations! You've leveled up to Level " + stats.getCurrentLevel() + "!", Toast.LENGTH_SHORT).show();
         }
 
-        // Update the database with new XP and level
-        repository.updateUserStatsXpAndLevel(
+        int fiveDayLoginStreak = stats.getFiveDayLoginStreak();
+        int totalLoginStreak = stats.getTotalLoginStreak();
+
+        if (fiveDayLoginStreak == 5) {
+            // Reset five-day streak only
+            stats.setFiveDayLoginStreak(1);
+            Log.d("DailyClaim", "Five-day streak completed! Resetting five-day streak.");
+        } else {
+            stats.setFiveDayLoginStreak(fiveDayLoginStreak + 1);
+        }
+
+        stats.setTotalLoginStreak(totalLoginStreak + 1); // Always increment total streak
+
+        homePageRepository.updateUserStatsXpAndStreak(
                 Integer.parseInt(userId),
                 stats.getCurrentXp(),
                 stats.getCurrentLevel(),
-                stats.getTotalXp()
+                stats.getTotalXp(),
+                stats.getFiveDayLoginStreak(),
+                stats.getTotalLoginStreak(),
+                currentDate
         );
 
-        // Update the database to mark the day as claimed
-        repository.updateUserStreakAndDate(Integer.parseInt(userId), dayNumber, currentDate);
+//        repository.updateUserStreakAndDate(Integer.parseInt(userId), dayNumber, currentDate);
+        Log.d("DailyClaim", "Streak updated for Day " + dayNumber);
 
         AchievementTracker tracker = new AchievementTracker(requireContext());
         tracker.evaluateAchievements(Integer.parseInt(userId));
+        Log.d("DailyClaim", "Achievements evaluated.");
 
-        // Fetch updated user stats to refresh the UI
         fetchUserStats();
 
-        // Notify the user
         Toast.makeText(getContext(), "Day " + dayNumber + " claimed! You earned 200 XP!", Toast.LENGTH_SHORT).show();
     }
+
+    private long getDaysDifference(String lastClaimDate, String testCurrentDate) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date lastDate = dateFormat.parse(lastClaimDate);
+            Date currentDate = testCurrentDate != null
+                    ? dateFormat.parse(testCurrentDate)
+                    : new Date();
+
+            long differenceInMillis = currentDate.getTime() - lastDate.getTime();
+            return differenceInMillis / (24 * 60 * 60 * 1000); // Convert milliseconds to days
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DailyClaim", "Error parsing dates: " + e.getMessage());
+            return 0; // Default to no difference if an error occurs
+        }
+    }
+
 
 
 }

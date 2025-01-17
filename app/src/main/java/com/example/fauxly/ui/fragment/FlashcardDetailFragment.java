@@ -36,7 +36,8 @@ public class FlashcardDetailFragment extends Fragment {
     private List<FlashCardItem> flashCardItems;
 
     private TextView wordTextView, pronunciationTextView, translationTextView, counterTextView;
-    private Button nextButton, prevButton, addCardButton;
+    private Button nextButton, prevButton;
+    private MaterialButton addCardButton;
     private MaterialButton backButton, audioButton;
     private int currentIndex = 0;
 
