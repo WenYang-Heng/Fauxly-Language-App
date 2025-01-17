@@ -76,10 +76,9 @@ public class FlashCardFragment extends Fragment {
         // Fetch flashcards for the current user
         flashCardList = repository.getFlashCardsByUserId(Integer.parseInt(userId));
 
-        // Pass correct parameters to adapter's click listener
         adapter = new FlashCardAdapter(
-                flashCardList,                      // Passes the list of FlashCard objects
-                (flashcardId, flashcardName) -> {   // Lambda matching OnFlashCardClickListener
+                flashCardList,                      // Pass the list
+                (flashcardId, flashcardName) -> {
                     navigateToFlashCardDetail(flashcardId, flashcardName);
                 },
                 repository                          // DatabaseRepository instance
@@ -102,7 +101,6 @@ public class FlashCardFragment extends Fragment {
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
-        // Positive button to save flashcard
         builder.setPositiveButton("Add", (dialog, which) -> {
             String flashCardName = input.getText().toString().trim();
             if (!flashCardName.isEmpty()) {
@@ -111,7 +109,6 @@ public class FlashCardFragment extends Fragment {
             }
         });
 
-        // Negative button to cancel
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
